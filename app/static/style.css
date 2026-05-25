@@ -1,0 +1,57 @@
+/* assets/style.css */
+/* Global Dark Aerospace Theme */
+.stApp {
+    background-color: #000000;
+    color: #e6eef6;
+}
+/* Sidebar */
+[data-testid="stSidebar"] {
+    background-color: #000000 !important;
+    border-right: 1px solid #111111;
+}
+/* Headers */
+h1, h2, h3, h4, h5, h6 {
+    color: #f8fafc;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+}
+/* Metric Cards */
+[data-testid="stMetricValue"] {
+    color: #dbeafe;
+    font-family: monospace;
+}
+[data-testid="stMetricDelta"] {
+    color: #c7f9d6;
+}
+/* Dataframes */
+.stDataFrame {
+    background-color: #070707;
+    border-radius: 6px;
+    border: 1px solid #111111;
+}
+/* Custom Status Badge */
+.status-badge {
+    padding: 0.15rem 0.5rem;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    display: inline-block;
+    background: transparent;
+}
+.status-critical { color: #ff6b6b; border: 1px solid rgba(255,107,107,0.15); }
+.status-warning  { color: #ffb86b; border: 1px solid rgba(255,184,107,0.12); }
+.status-caution  { color: #ffe98a; border: 1px solid rgba(255,233,138,0.10); }
+.status-nominal  { color: #9ee6a7; border: 1px solid rgba(158,230,167,0.10); }
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 2rem;
+    background-color: #000000;
+}
+.stTabs [data-baseweb="tab"] {
+    color: #94a3b8;
+    border-bottom: 2px solid transparent;
+}
+.stTabs [data-baseweb="tab"][aria-selected="true"] {
+    color: #dbeafe;
+    border-bottom-color: #dbeafe;
+}

@@ -1,0 +1,82 @@
+version: "3.9"
+ 
+# ─────────────────────────────────────────────────────────────────────────────
+# LSTM Anomaly Detector — docker-compose
+#
+# Services
+# --------
+#   anomaly-detector   ← main API (FastAPI + Uvicorn, port 8080)
+#
+# Volumes
+# -------
+#   data      ← input CSVs uploaded via API
+#   model     ← saved model artifacts (persists across restarts)
+#   results   ← inference outputs (CSVs, plots)
+#
+# Usage
+# -----
+#   docker compose up --build          # start
+#   docker compose up -d               # start detached
+#   docker compose logs -f             # follow logs
+#   docker compose down                # stop + remove containers
+#   docker compose down -v             # stop + remove containers AND volumes
+# ─────────────────────────────────────────────────────────────────────────────
+ 
+services:
+  anomaly-detector:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: lstm-anomaly-detector:latest
+    container_name: lstm_anomaly_detector
+    restart: unless-stopped
+ 
+    ports:
+      - "8080:8080"
+ 
+    environment:
+      MODEL_DIR: /model
+      DATA_DIR: /data
+      RESULTS_DIR: /results
+      TF_CPP_MIN_LOG_LEVEL: "2"
+      PYTHONUNBUFFERED: "1"
+
+    volumes:
+      - data:/data
+      - model:/model
+      - results:/results
+ 
+    # Resource limits — adjust for your machine
+    # CPU-only TF training on 1273 segments × 50 epochs ≈ 10–20 min
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 8G
+        reservations:
+          cpus: "1"
+          memory: 2G
+ 
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+ 
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+ 
+# ─────────────────────────────────────────────────────────────────────────────
+# Named volumes — Docker manages these; data survives container restarts
+# ─────────────────────────────────────────────────────────────────────────────
+volumes:
+  data:
+    driver: local
+  model:
+    driver: local
+  results:
+    driver: local
