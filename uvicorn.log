@@ -1,0 +1,298 @@
+INFO:     Will watch for changes in these directories: ['/Users/akhilaa/LSTM_anomaly/app']
+INFO:     Uvicorn running on http://0.0.0.0:8088 (Press CTRL+C to quit)
+INFO:     Started reloader process [7431] using WatchFiles
+INFO:     Started server process [7468]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:61668 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61668 - "GET /static/netra.js?v=7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61668 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61671 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61671 - "GET /model/loss_curve.png?t=1779874581568 HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61671 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:61686 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61695 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61695 - "POST /test HTTP/1.1" 400 Bad Request
+INFO:     127.0.0.1:61695 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61695 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61722 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61731 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61732 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61743 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61753 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61753 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61753 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61768 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61781 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61782 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61792 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61801 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61801 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61801 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61825 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61833 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61835 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61845 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61898 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61899 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61998 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:61999 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62087 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62086 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62087 - "GET /model/loss_curve.png?t=1779874835334 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62086 - "GET /model/loss_curve.png?t=1779874835333 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62119 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62121 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62121 - "GET /model/loss_curve.png?t=1779874852448 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62131 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62139 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62139 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62139 - "GET /model/loss_curve.png?t=1779874867250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62139 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62153 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62164 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62166 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62166 - "GET /model/loss_curve.png?t=1779874882257 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62176 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62184 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62184 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62184 - "GET /model/loss_curve.png?t=1779874897251 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62184 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62209 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62218 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62219 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62219 - "GET /model/loss_curve.png?t=1779874912253 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62232 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62232 - "POST /test HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62232 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62241 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62244 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62232 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62241 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62244 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62244 - "GET /model/loss_curve.png?t=1779874929866 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62244 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+/Users/akhilaa/.pyenv/versions/3.11.9/lib/python3.11/site-packages/requests/__init__.py:109: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (7.4.3)/charset_normalizer (3.4.4) doesn't match a supported version!
+  warnings.warn(
+INFO:     127.0.0.1:62244 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62244 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62232 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62232 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+[CONFIG] threshold=0.00026767320537880875, max_len=100
+[INFERENCE] Loaded CSV shape=(10800, 4)
+INFO:     127.0.0.1:62232 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62232 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62244 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62244 - "GET /model/loss_curve.png?t=1779874941386 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "POST /test HTTP/1.1" 200 OK
+[CONFIG] threshold=0.00026767320537880875, max_len=100
+[INFERENCE] Loaded CSV shape=(10800, 4)
+INFO:     127.0.0.1:62250 - "GET /jobs/bf84fe65-cbc0-472d-a0ce-7b86c8969b05 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "GET /model/loss_curve.png?t=1779874956388 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62251 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62317 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62318 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62318 - "GET /model/loss_curve.png?t=1779874972254 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62328 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62336 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62336 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62336 - "GET /model/loss_curve.png?t=1779874987264 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62336 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62355 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62367 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62368 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62368 - "GET /model/loss_curve.png?t=1779875002257 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62380 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62388 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62388 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62388 - "GET /model/loss_curve.png?t=1779875017247 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62388 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62439 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62441 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62441 - "GET /model/loss_curve.png?t=1779875049702 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62451 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62468 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62469 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62469 - "GET /model/loss_curve.png?t=1779875062249 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62480 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62488 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62488 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62488 - "GET /model/loss_curve.png?t=1779875077246 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62488 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62515 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62523 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62525 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62525 - "GET /model/loss_curve.png?t=1779875092251 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62535 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62545 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62545 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62545 - "GET /model/loss_curve.png?t=1779875107230 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62545 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62584 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62585 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62585 - "GET /model/loss_curve.png?t=1779875135225 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62637 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62636 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62636 - "GET /model/loss_curve.png?t=1779875166834 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62636 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62636 - "POST /test HTTP/1.1" 200 OK
+[CONFIG] threshold=0.00026767320537880875, max_len=100
+[INFERENCE] Loaded CSV shape=(10800, 4)
+INFO:     127.0.0.1:62636 - "GET /jobs/04038fc5-1c57-4408-92dd-09d3d0169385 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62636 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62656 - "GET /jobs/7454fc43-0f8e-4d96-b219-3d2612d76272 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62659 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62660 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62660 - "GET /model/loss_curve.png?t=1779875182214 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62671 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62679 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62679 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62679 - "GET /model/loss_curve.png?t=1779875197213 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62679 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62706 - "GET /health HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'config.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [7468]
+INFO:     Started server process [7694]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:62720 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62721 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62721 - "GET /model/loss_curve.png?t=1779875213618 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62721 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62752 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62752 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62752 - "GET /model/loss_curve.png?t=1779875227214 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62752 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62768 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62795 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62796 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62796 - "GET /model/loss_curve.png?t=1779875255221 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62820 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62820 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62820 - "GET /model/loss_curve.png?t=1779875265652 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62820 - "POST /test HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62820 - "GET /jobs/68bedafc-8f67-446e-9054-ced7200fbc18 HTTP/1.1" 200 OK
+/Users/akhilaa/.pyenv/versions/3.11.9/lib/python3.11/site-packages/requests/__init__.py:109: RequestsDependencyWarning: urllib3 (2.6.3) or chardet (7.4.3)/charset_normalizer (3.4.4) doesn't match a supported version!
+  warnings.warn(
+[CONFIG] Loaded dynamic params from metadata: threshold=0.000268, max_len=100
+INFO:     127.0.0.1:62820 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62822 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62822 - "GET /model/loss_curve.png?t=1779875271369 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62822 - "GET /jobs/68bedafc-8f67-446e-9054-ced7200fbc18 HTTP/1.1" 200 OK
+[CONFIG] threshold=0.00026767320537880875, max_len=100
+[INFERENCE] Loaded CSV shape=(10800, 4)
+[PREPROCESS] Channel=battery_current Points=1800
+[PREPROCESS] Generated 171 windows for battery_current
+[PREPROCESS] Channel=battery_voltage Points=1800
+[PREPROCESS] Generated 171 windows for battery_voltage
+[PREPROCESS] Channel=bus_current Points=1800
+[PREPROCESS] Generated 171 windows for bus_current
+[PREPROCESS] Channel=payload_power Points=1800
+[PREPROCESS] Generated 171 windows for payload_power
+[PREPROCESS] Channel=solar_panel_voltage Points=1800
+[PREPROCESS] Generated 171 windows for solar_panel_voltage
+[PREPROCESS] Channel=thermal_sensor Points=1800
+[PREPROCESS] Generated 171 windows for thermal_sensor
+[MSE] battery_current: min=3.393953 p50=18.712833 p95=30.171102 max=33.942043
+INFO:     127.0.0.1:62822 - "GET /jobs/68bedafc-8f67-446e-9054-ced7200fbc18 HTTP/1.1" 200 OK
+[MSE] battery_voltage: min=57.092854 p50=73.731865 p95=281.483887 max=375.258087
+[MSE] bus_current: min=4.869767 p50=18.054695 p95=79.932777 max=153.894424
+[MSE] payload_power: min=428.646027 p50=457.194397 p95=1044.232849 max=1069.986938
+[MSE] solar_panel_voltage: min=71.252563 p50=90.389946 p95=689.724579 max=732.782349
+INFO:     127.0.0.1:62822 - "GET /jobs/68bedafc-8f67-446e-9054-ced7200fbc18 HTTP/1.1" 200 OK
+[MSE] thermal_sensor: min=91.543175 p50=111.906189 p95=629.352203 max=838.330566
+[INFERENCE] Total windows=1026 min=3.393953 p95=473.416847 max=1069.986938 stored=0.000268
+[THRESHOLD] 473.416847 — scale mismatch: stored=0.000268 < p05=9.251865, using p95=473.416847
+[INFERENCE] Anomalies: 52/1026 (5.1%)
+INFO:     127.0.0.1:62822 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62822 - "GET /jobs/68bedafc-8f67-446e-9054-ced7200fbc18 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62822 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62822 - "GET /results/20260527_094755/all_segments.csv HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62822 - "GET /model/loss_curve.png?t=1779875277448 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62822 - "GET /model/loss_curve.png?t=1779875277511 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62839 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62839 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62839 - "GET /model/loss_curve.png?t=1779875286348 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62839 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62863 - "GET /model/loss_curve.png?t=1779875294964 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62863 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62875 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62876 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62876 - "GET /model/loss_curve.png?t=1779875301348 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62886 - "GET /model/loss_curve.png?t=1779875306681 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62886 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62886 - "GET /model/loss_curve.png?t=1779875310434 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62886 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62886 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62886 - "GET /model/loss_curve.png?t=1779875316344 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62886 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62916 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62926 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62928 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62928 - "GET /model/loss_curve.png?t=1779875331348 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62938 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62948 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62948 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62948 - "GET /model/loss_curve.png?t=1779875347217 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62948 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62961 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62978 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62979 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62979 - "GET /model/loss_curve.png?t=1779875362209 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62990 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63007 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63007 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63007 - "GET /model/loss_curve.png?t=1779875377213 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63013 - "GET /model/loss_curve.png?t=1779875377214 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63013 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63024 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63100 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63101 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63101 - "GET /model/loss_curve.png?t=1779875435287 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63187 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63185 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63185 - "GET /model/loss_curve.png?t=1779875495259 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63270 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63269 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63269 - "GET /model/loss_curve.png?t=1779875555240 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63329 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63327 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63327 - "GET /model/loss_curve.png?t=1779875595510 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63346 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63347 - "GET /model/loss_curve.png?t=1779875602208 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63358 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63367 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63367 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63367 - "GET /model/loss_curve.png?t=1779875617206 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63367 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63391 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63401 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63402 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63402 - "GET /model/loss_curve.png?t=1779875632208 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63411 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63421 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63421 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63421 - "GET /model/loss_curve.png?t=1779875647202 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63421 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63435 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63477 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63478 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63478 - "GET /model/loss_curve.png?t=1779875675239 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63570 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63569 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63569 - "GET /model/loss_curve.png?t=1779875735277 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63653 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63652 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63652 - "GET /model/loss_curve.png?t=1779875795250 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63653 - "GET /model/loss_curve.png?t=1779875795251 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63752 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63751 - "GET /status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:63751 - "GET /model/loss_curve.png?t=1779875855244 HTTP/1.1" 200 OK

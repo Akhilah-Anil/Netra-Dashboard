@@ -9,7 +9,9 @@ from pathlib import Path
 # ── Paths ─────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).resolve().parent
 
-MODEL_DIR = BASE_DIR / "saved_model"
+MODEL_DIR = Path(os.getenv("MODEL_DIR", BASE_DIR / "saved_model"))
+DATA_DIR = Path(os.getenv("DATA_DIR", BASE_DIR / "data"))
+RESULTS_DIR = Path(os.getenv("RESULTS_DIR", BASE_DIR / "results"))
 
 MODEL_PATH = MODEL_DIR / "lstm_autoencoder.keras"
 
