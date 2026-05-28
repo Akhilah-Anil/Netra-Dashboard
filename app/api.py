@@ -230,6 +230,194 @@ def _run_inference(job_id: str, telemetry_path: str,
     except Exception:
         _finish_job(job_id, error=traceback.format_exc())
 
+# ── Global ML Engine Caching for WebSockets ──────────────────────────────────
+_keras_model = None
+_sig_scaler = None
+_stat_scaler = None
+_metadata = None
+_engine_lock = threading.Lock()
+
+def _load_engine():
+    global _keras_model, _sig_scaler, _stat_scaler, _metadata
+    with _engine_lock:
+        if _keras_model is not None:
+            return True
+        model_path = MODEL_DIR / 'lstm_autoencoder.keras'
+        meta_path = MODEL_DIR / 'metadata.json'
+        if not model_path.exists() or not meta_path.exists():
+            return False
+        try:
+            import tensorflow as tf
+            import pickle
+            from config import SIGNAL_SCALER_PATH, STAT_SCALER_PATH
+            _keras_model = tf.keras.models.load_model(str(model_path), compile=False)
+            with open(meta_path) as f:
+                _metadata = json.load(f)
+            with open(SIGNAL_SCALER_PATH, 'rb') as f:
+                _sig_scaler = pickle.load(f)
+            with open(STAT_SCALER_PATH, 'rb') as f:
+                _stat_scaler = pickle.load(f)
+            print("[ENGINE] ML Engine successfully cached for real-time WebSocket inference.")
+            return True
+        except Exception as e:
+            print(f"[ENGINE] Failed to load ML engine: {e}")
+            return False
+
+# ── WebSocket Telemetry Endpoint ──────────────────────────────────────────────
+@app.websocket("/ws/telemetry")
+async def ws_telemetry(websocket: WebSocket):
+    await websocket.accept()
+    
+    # Try to load the model engine globally
+    engine_loaded = _load_engine()
+    threshold = float(_metadata.get('threshold', 0.000268)) if engine_loaded else 0.000268
+    
+    # Store rolling windows of raw values per channel
+    # Sliding window size is MAX_LEN (100)
+    history = {
+        "Solar Panel Current": [],
+        "Battery Voltage": [],
+        "Battery Temperature": [],
+        "Reaction Wheel Speed": [],
+        "Transceiver Temp": [],
+        "Bus Voltage": []
+    }
+    
+    # Simulated baselines and phases
+    t_step = 0
+    anomaly_timer = 0
+    active_anomaly_channel = None
+    
+    try:
+        while True:
+            # Check for control messages (non-blocking)
+            try:
+                data = await asyncio.wait_for(websocket.receive_json(), timeout=0.01)
+                cmd = data.get("command")
+                if cmd == "inject_anomaly":
+                    active_anomaly_channel = data.get("channel")
+                    anomaly_timer = 50 # Inject anomaly for next 50 timesteps (approx 10s)
+                    print(f"[WS] Injecting anomaly on channel: {active_anomaly_channel}")
+            except asyncio.TimeoutError:
+                pass
+            
+            t_step += 1
+            timestamp = datetime.utcnow().isoformat() + 'Z'
+            
+            # 1. Telemetry Generation (with dynamic anomaly injection)
+            payload = {}
+            for channel in history.keys():
+                # Define standard nominal baselines with sinewave frequencies
+                if channel == "Solar Panel Current":
+                    # Nominal: 1.5 - 2.5 A (periodic solar exposure)
+                    val = 2.0 + 0.4 * np.sin(t_step * 0.05) + np.random.normal(0, 0.05)
+                    if active_anomaly_channel == channel and anomaly_timer > 0:
+                        val = 0.2 + np.random.normal(0, 0.02) # Array shadow drop
+                elif channel == "Battery Voltage":
+                    # Nominal: 24.0 - 27.5 V
+                    val = 25.8 + 0.8 * np.sin(t_step * 0.02) + np.random.normal(0, 0.08)
+                    if active_anomaly_channel == channel and anomaly_timer > 0:
+                        val = 31.5 + np.random.normal(0, 0.2) # High charge spike
+                elif channel == "Battery Temperature":
+                    # Nominal: 20 - 32 °C
+                    val = 26.0 + 3.0 * np.sin(t_step * 0.01) + np.random.normal(0, 0.1)
+                    if active_anomaly_channel == channel and anomaly_timer > 0:
+                        val = 55.0 + (50 - anomaly_timer) * 0.5 + np.random.normal(0, 0.3) # Thermal runaway climb
+                elif channel == "Reaction Wheel Speed":
+                    # Nominal: 1500 - 2500 RPM
+                    val = 2000.0 + 300.0 * np.cos(t_step * 0.08) + np.random.normal(0, 10.0)
+                    if active_anomaly_channel == channel and anomaly_timer > 0:
+                        val = 150.0 + np.random.normal(0, 5.0) # Seizure RPM collapse
+                elif channel == "Transceiver Temp":
+                    # Nominal: 30 - 40 °C
+                    val = 35.0 + 2.0 * np.sin(t_step * 0.04) + np.random.normal(0, 0.08)
+                    if active_anomaly_channel == channel and anomaly_timer > 0:
+                        val = 72.0 + np.random.normal(0, 0.5) # Transmitter overheating
+                elif channel == "Bus Voltage":
+                    # Nominal: Regulated 28.0 V
+                    val = 28.0 + np.random.normal(0, 0.05)
+                    if active_anomaly_channel == channel and anomaly_timer > 0:
+                        val = 21.2 + np.random.normal(0, 0.6) # Main bus sag/undervoltage
+                
+                # Append raw point to history queue
+                history[channel].append(float(val))
+                if len(history[channel]) > 100:
+                    history[channel].pop(0)
+                
+                # 2. Real-Time Inference using cached LSTM model (if available)
+                mse_val = 0.0
+                is_anomaly = 0
+                severity = "Normal"
+                
+                if engine_loaded and len(history[channel]) == 100:
+                    try:
+                        from preprocessing import compute_stat_features
+                        win_val = np.array(history[channel], dtype=np.float32)
+                        
+                        # Scale raw signal
+                        win_val_scaled = _sig_scaler.transform(win_val.reshape(-1, 1))
+                        win_val_scaled = np.clip(win_val_scaled, -50.0, 50.0)
+                        
+                        # Compute statistical features
+                        stats = compute_stat_features(win_val)
+                        stats_scaled = _stat_scaler.transform(stats.reshape(1, -1))
+                        stats_scaled = np.clip(stats_scaled, -50.0, 50.0)
+                        
+                        # Tile and concatenate into shape (100, 17)
+                        stats_tiled = np.tile(stats_scaled, (100, 1))
+                        combined = np.hstack([win_val_scaled, stats_tiled]) # (100, 17)
+                        
+                        # Add batch dimension -> (1, 100, 17)
+                        X_input = np.expand_dims(combined, axis=0)
+                        
+                        # Predict
+                        X_pred = _keras_model.predict(X_input, verbose=0)
+                        
+                        # Compute reconstruction MSE
+                        mse_val = float(np.mean(np.square(X_input - X_pred)))
+                        is_anomaly = int(mse_val > threshold)
+                        severity = _classify_severity(mse_val, threshold)
+                    except Exception as e:
+                        # Fallback calculation if inference fails
+                        is_anomaly = 1 if (active_anomaly_channel == channel and anomaly_timer > 0) else 0
+                        mse_val = threshold * 5.2 if is_anomaly else threshold * 0.4
+                        severity = "Severe" if is_anomaly else "Normal"
+                else:
+                    # Fallback math model (Rules) if LSTM model is not loaded yet
+                    is_anomaly = 1 if (active_anomaly_channel == channel and anomaly_timer > 0) else 0
+                    mse_val = threshold * 4.8 if is_anomaly else threshold * (0.3 + 0.1 * np.sin(t_step * 0.1))
+                    severity = "Severe" if is_anomaly else "Normal"
+                
+                payload[channel] = {
+                    "value": float(val),
+                    "mse": float(mse_val),
+                    "anomaly": is_anomaly,
+                    "severity": severity
+                }
+            
+            # Send payload down to frontend
+            await websocket.send_json({
+                "timestamp": timestamp,
+                "threshold": threshold,
+                "data": payload
+            })
+            
+            # Decrement anomaly active timer
+            if anomaly_timer > 0:
+                anomaly_timer -= 1
+                if anomaly_timer == 0:
+                    active_anomaly_channel = None
+                    print("[WS] Anomaly timer expired. Reverting to nominal state.")
+            
+            # yield to event loop (5Hz frequency = smooth UI updates)
+            await asyncio.sleep(0.2)
+            
+    except WebSocketDisconnect:
+        print("[WS] Telemetry client disconnected.")
+    except Exception as e:
+        print(f"[WS] WebSocket error: {e}")
+        traceback.print_exc()
+
 # ── Endpoints ─────────────────────────────────────────────────────────────────
 @app.post('/test')
 async def test(

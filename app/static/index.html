@@ -1,1272 +1,434 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NETRA — Mission Telemetry Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
-<style>
-:root{
-  --deep:#000000;--panel:#0a0a0a;--card:#0d0d0d;
-  --card2:#111111;--border:rgba(255,255,255,.07);--glow:rgba(255,255,255,.12);
-  --cyan:#8ab4c8;--blue:#6b8fc9;--green:#3fb950;--red:#f85149;
-  --yellow:#d29922;--orange:#c77a2b;--purple:#7c67b3;
-  --tp:#c9d1d9;--ts:#6e7681;--tm:#444c56;
-  --mono:'JetBrains Mono',monospace;--disp:'Outfit',sans-serif;--body:'DM Sans',sans-serif;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-::-webkit-scrollbar{width:3px;height:3px}
-::-webkit-scrollbar-track{background:var(--deep)}
-::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:2px}
-body{background:var(--deep);color:var(--tp);font-family:var(--body);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-
-/* HEADER */
-.hdr{height:46px;min-height:46px;background:linear-gradient(180deg,rgba(8,14,28,.98),rgba(3,6,15,.95));border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;backdrop-filter:blur(12px);z-index:50}
-.hdr-left{display:flex;align-items:center;gap:12px}
-.brand-logo{font-size:14px;color:var(--ts);letter-spacing:2px}
-.brand-name{font-family:var(--disp);font-size:17px;font-weight:700;letter-spacing:3px;color:#e6edf3;}
-.brand-sub{font-size:9px;color:var(--tm);letter-spacing:1.5px;text-transform:uppercase;font-family:var(--mono)}
-.hdr-center{display:flex;align-items:center;gap:6px}
-.pill{display:flex;align-items:center;gap:4px;padding:3px 9px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;border:1px solid}
-.p-live{background:rgba(34,197,94,.1);color:var(--green);border-color:rgba(34,197,94,.25)}
-.p-crit{background:rgba(239,68,68,.12);color:var(--red);border-color:rgba(239,68,68,.3)}
-.p-warn{background:rgba(245,158,11,.1);color:var(--yellow);border-color:rgba(245,158,11,.25)}
-.p-nom{background:rgba(138,180,200,.06);color:var(--cyan);border-color:rgba(138,180,200,.15)}
-.dot{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 6px currentColor}
-.hdr-right{display:flex;align-items:center;gap:14px}
-.orbtrix{font-family:var(--disp);font-size:12px;font-weight:600;letter-spacing:3px;color:var(--ts)}
-.sys-s{display:flex;align-items:center;gap:5px;color:var(--ts);font-size:10px;font-family:var(--mono)}
-
-/* TICKER */
-.ticker{height:28px;min-height:28px;background:rgba(6,12,26,.7);border-bottom:1px solid var(--border);overflow:hidden;display:flex;align-items:center}
-.ticker-inner{display:flex;gap:40px;animation:tick 45s linear infinite;white-space:nowrap;padding-left:100%}
-@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.ti{font-family:var(--mono);font-size:9px;color:var(--ts);display:flex;align-items:center;gap:8px}
-.tc{color:var(--cyan);font-weight:600}.tw{color:var(--yellow)}.tr{color:var(--red)}.tg{color:var(--green)}
-
-/* LAYOUT */
-.layout{flex:1;display:grid;grid-template-columns:230px 1fr 300px;overflow:hidden;height:calc(100vh - 74px)}
-
-/* SIDEBAR */
-.sidebar{background:var(--panel);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:10px 8px;gap:2px;overflow-y:auto}
-.sec-t{font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--tm);padding:10px 8px 5px;border-bottom:1px solid var(--border);margin-bottom:2px}
-.nav-i{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:4px;font-size:11px;font-weight:500;color:var(--ts);cursor:pointer;transition:all .18s;border:1px solid transparent}
-.nav-i:hover{background:rgba(0,212,255,.05);color:var(--tp);border-color:var(--border)}
-.nav-i.active{background:rgba(0,212,255,.1);color:var(--cyan);border-color:rgba(0,212,255,.2)}
-.card{background:rgba(10,18,36,.5);border:1px solid var(--border);border-radius:5px;padding:10px;margin-top:6px}
-.zone{border:1px dashed rgba(0,212,255,.2);border-radius:4px;padding:12px 8px;text-align:center;cursor:pointer;transition:all .2s;background:rgba(0,0,0,.2);font-size:10px;color:var(--ts)}
-.zone:hover{border-color:var(--cyan);background:rgba(0,212,255,.03)}
-.zone input{display:none}
-.flbl{font-size:9px;color:var(--cyan);margin-top:3px;word-break:break-all}
-.btn{width:100%;background:#1a1f2e;border:1px solid rgba(255,255,255,.1);border-radius:4px;color:#c9d1d9;padding:7px;font-family:var(--disp);font-weight:600;font-size:11px;cursor:pointer;transition:all .2s;margin-top:7px}
-.btn:hover{background:#21262d;border-color:rgba(255,255,255,.2)}
-.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-.inp{width:100%;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);border-radius:3px;color:var(--tp);padding:5px 8px;font-size:10px;font-family:var(--mono);margin-top:5px}
-.inp-l{font-size:9px;color:var(--ts);display:block;margin-top:6px}
-
-/* CENTER */
-.center{display:flex;flex-direction:column;overflow:hidden;background:var(--deep)}
-.c-hdr{height:38px;min-height:38px;background:rgba(10,18,36,.5);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px}
-.c-title{font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--cyan)}
-.c-stats{display:flex;gap:16px;font-size:9px;font-family:var(--mono);color:var(--ts)}
-.c-stat strong{color:var(--tp)}
-.scroll{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
-
-/* KPI */
-.kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.kpi{background:var(--card);border:1px solid var(--border);border-radius:5px;padding:10px 12px;transition:border-color .2s}
-.kpi:hover{border-color:var(--glow)}
-.kpi-l{font-size:8px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--tm)}
-.kpi-v{font-family:var(--disp);font-size:22px;font-weight:800;color:var(--tp);line-height:1}
-.kpi-s{font-size:9px;color:var(--ts);font-family:var(--mono)}
-.kpi.crit{border-color:rgba(239,68,68,.25)}.kpi.crit .kpi-v{color:var(--red)}
-.kpi.warn{border-color:rgba(245,158,11,.2)}.kpi.warn .kpi-v{color:var(--yellow)}
-
-/* ALERT */
-.alert{padding:8px 14px;border-radius:5px;border:1px solid;display:flex;align-items:center;gap:10px}
-.alert-icon{font-size:16px}
-.alert-status{font-weight:700;font-family:var(--disp);font-size:13px}
-.alert-msg{color:var(--ts);font-size:10px}
-
-/* BATTERY HEALTH */
-.health{background:var(--card);border:1px solid var(--border);border-radius:5px;padding:10px 14px;display:flex;align-items:center;gap:16px}
-.h-icon{font-size:22px}
-.h-title{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--tm);margin-bottom:2px}
-.h-status{font-family:var(--disp);font-size:16px;font-weight:800}
-.bar-bg{height:6px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;flex:2}
-.bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
-.h-metrics{display:flex;gap:20px}
-.h-m-v{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--cyan)}
-.h-m-l{font-size:8px;color:var(--tm);text-transform:uppercase;letter-spacing:1px}
-
-/* SECTION TITLE */
-.sec-line{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--ts);display:flex;align-items:center;gap:8px}
-.sec-line::after{content:'';flex:1;height:1px;background:rgba(255,255,255,.06)}
-
-/* PARAM GRID — 3x2 */
-.param-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.pc{background:rgba(6,12,26,.85);border:1px solid var(--border);border-radius:6px;padding:10px;display:flex;flex-direction:column;gap:6px;transition:border-color .2s;position:relative;overflow:hidden}
-.pc::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:6px 6px 0 0;background:var(--pc,var(--cyan));opacity:.7}
-.pc:hover{border-color:var(--glow);background:var(--card)}
-.pc-hdr{display:flex;align-items:flex-start;justify-content:space-between}
-.pc-name{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:var(--ts)}
-.pc-icon{font-size:14px}
-.pc-live{display:flex;align-items:baseline;gap:4px}
-.pc-val{font-family:var(--mono);font-size:20px;font-weight:600;color:var(--pc,var(--cyan));transition:color .3s}
-.pc-unit{font-size:10px;color:var(--ts);font-family:var(--mono)}
-.pc-badge{font-size:8px;font-weight:700;padding:2px 6px;border-radius:2px;text-transform:uppercase;letter-spacing:.5px;background:rgba(34,197,94,.12);color:var(--green);border:1px solid rgba(34,197,94,.2);align-self:flex-start}
-.pc-badge.warn{background:rgba(245,158,11,.12);color:var(--yellow);border-color:rgba(245,158,11,.2)}
-.pc-badge.crit{background:rgba(239,68,68,.12);color:var(--red);border-color:rgba(239,68,68,.2)}
-.pc-chart{height:130px}
-
-/* RIGHT PANEL */
-.right{background:var(--panel);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
-.psec{display:flex;flex-direction:column;border-bottom:1px solid var(--border)}
-.phdr{height:34px;min-height:34px;background:rgba(10,18,36,.5);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 10px}
-.pttl{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--cyan)}
-.pcnt{flex:1;overflow-y:auto;padding:8px}
-.ai{background:rgba(10,18,36,.5);border:1px solid var(--border);border-radius:4px;padding:7px 8px;margin-bottom:5px;font-size:10px}
-.ai-hdr{display:flex;justify-content:space-between;margin-bottom:3px}
-.ai-ch{font-weight:600;color:var(--tp);font-size:10px}
-.ai-err{font-family:var(--mono);font-size:9px;color:var(--tm)}
-.ai-desc{font-size:9px;color:var(--ts);margin-bottom:3px}
-.ai-meta{display:flex;justify-content:space-between;font-size:8px;color:var(--tm);font-family:var(--mono)}
-.sc{color:var(--red);font-weight:700}.sw{color:var(--yellow);font-weight:700}.sm{color:var(--orange);font-weight:700}
-.ev{padding:4px 3px;border-bottom:1px solid rgba(255,255,255,.03);font-family:var(--mono);font-size:8px;color:var(--ts);display:flex;gap:6px}
-.et{color:var(--cyan);font-weight:600;min-width:54px}
-.et.err{color:var(--red)}.et.ok{color:var(--green)}.et.warn{color:var(--yellow)}
-
-/* COPILOT */
-#copilot{position:fixed;top:46px;right:0;width:340px;height:calc(100vh - 46px);background:rgba(6,12,26,.97);border-left:1px solid var(--glow);display:none;flex-direction:column;z-index:100;backdrop-filter:blur(14px)}
-.co-hdr{height:38px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 14px}
-.co-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px}
-.co-msg{border-radius:7px;padding:10px;max-width:88%}
-.co-msg.ai{background:rgba(0,212,255,.08);border:1px solid rgba(0,212,255,.18);align-self:flex-start}
-.co-msg.user{background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.18);align-self:flex-end}
-.co-from{font-size:9px;font-weight:700;margin-bottom:4px}
-.co-msg.ai .co-from{color:var(--cyan)}.co-msg.user .co-from{color:var(--blue)}
-.co-text{font-size:11px;color:var(--tp);line-height:1.5}
-.co-row{padding:10px;border-top:1px solid var(--border);display:flex;gap:6px}
-.co-inp{flex:1;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.1);border-radius:4px;color:var(--tp);padding:7px 10px;font-size:11px;font-family:var(--mono)}
-.co-inp:focus{outline:none;border-color:rgba(0,212,255,.3)}
-.co-send{background:linear-gradient(135deg,var(--cyan),var(--blue));border:none;border-radius:4px;color:#fff;padding:7px 14px;font-weight:600;font-size:11px;cursor:pointer}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NETRA — Mission Telemetry Intelligence Console</title>
+  
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="/static/netra-styles.css">
+  
+  <!-- CDNs for Charts, 3D Rendering & Fonts -->
+  <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
 
-<!-- HEADER -->
-<header class="hdr">
-  <div class="hdr-left">
-    <span class="brand-logo">—</span>
-    <div>
-      <div class="brand-name">NETRA</div>
-      <div class="brand-sub">The Eye That Never Blinks</div>
-    </div>
-  </div>
-  <div class="hdr-center">
-    <div class="pill p-live"><span class="dot"></span>LIVE</div>
-    <span style="color:var(--tm);font-family:var(--mono);font-size:10px" id="clock">--:--:-- UTC</span>
-    <div class="pill p-crit"><span class="dot"></span><span id="hcrit">0 CRIT</span></div>
-    <div class="pill p-warn"><span class="dot"></span><span id="hwarn">0 WARN</span></div>
-    <div class="pill p-nom"><span class="dot"></span><span id="hnom">0 NOM</span></div>
-  </div>
-  <div class="hdr-right">
-    <div class="sys-s"><span class="dot" id="api-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></span>API <strong id="api-txt" style="color:var(--red)">OFFLINE</strong></div>
-    <div class="sys-s"><span class="dot" id="mdl-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></span>LSTM <strong id="mdl-txt" style="color:var(--red)">UNTRAINED</strong></div>
-    <div class="orbtrix">ORBTRIX</div>
-  </div>
-</header>
-
-<!-- TICKER -->
-<div class="ticker">
-  <div class="ticker-inner" id="ticker">
-    <div class="ti"><span class="tc">[PASS]</span>NTR-01 acquired by BLR-01 · downlink 38.4 Mbps</div>
-    <div class="ti"><span class="tw">[ECLIPSE]</span>NTR-03 entered Earth shadow · expected 19m</div>
-    <div class="ti"><span class="tg">[SAFE]</span>NTR-06 ADCS flagged · investigation underway</div>
-    <div class="ti"><span class="tc">[TLE]</span>NTR-04 TLE refreshed from 18 SDS · ΔV 0.004 m/s</div>
-    <div class="ti"><span class="tr">[ANOMALY]</span>Power deviation detected — awaiting analysis</div>
-    <div class="ti"><span class="tg">[NOMINAL]</span>Battery health within expected range</div>
-    <div class="ti"><span class="tw">[THERMAL]</span>Panel-2 temperature trending +2.3°C above baseline</div>
-    <div class="ti"><span class="tc">[PASS]</span>NTR-01 acquired by BLR-01 · downlink 38.4 Mbps</div>
-    <div class="ti"><span class="tw">[ECLIPSE]</span>NTR-03 entered Earth shadow · expected 19m</div>
-    <div class="ti"><span class="tg">[SAFE]</span>NTR-06 ADCS flagged · investigation underway</div>
-    <div class="ti"><span class="tc">[TLE]</span>NTR-04 TLE refreshed from 18 SDS · ΔV 0.004 m/s</div>
-    <div class="ti"><span class="tr">[ANOMALY]</span>Power deviation detected — awaiting analysis</div>
-    <div class="ti"><span class="tg">[NOMINAL]</span>Battery health within expected range</div>
-    <div class="ti"><span class="tw">[THERMAL]</span>Panel-2 temperature trending +2.3°C above baseline</div>
-  </div>
-</div>
-
-<!-- LAYOUT -->
-<div class="layout">
-
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <div class="sec-t">OPS</div>
-  <div class="nav-i active" data-view="fleet" onclick="showView('fleet')">Fleet Operations</div>
-  <div class="nav-i" data-view="streams" onclick="showView('streams')">Telemetry Streams</div>
-  <div class="nav-i" data-view="alerts" onclick="showView('alerts')">Alerts &amp; Incidents</div>
-  <div class="nav-i" data-view="replay" onclick="showView('replay')">Telemetry Replay</div>
-  <div class="sec-t">INTEL</div>
-  <div class="nav-i" data-view="anomaly" onclick="showView('anomaly')">Anomaly Detection</div>
-  <div class="nav-i" data-view="trend" onclick="showView('trend')">Trend Analysis</div>
-  <div class="nav-i" data-view="diag" onclick="showView('diag')">AI Diagnostics</div>
-  <div class="nav-i" data-view="copilot" onclick="toggleCopilot()">AI Copilot</div>
-  <div class="sec-t">ADMIN</div>
-  <div class="nav-i" data-view="training" onclick="showView('training')">Model Training</div>
-  <div class="nav-i" data-view="perf" onclick="showView('perf')">Performance Metrics</div>
-
-  <!-- UPLOAD -->
-  <div class="card">
-    <div class="sec-t" style="padding:0 0 6px;margin-bottom:6px">Telemetry Upload</div>
-    <form id="inf-form" onsubmit="doInference(event)">
-      <div class="zone" onclick="document.getElementById('inf-f').click()">
-        📁 Drop CSV or Click
-        <input type="file" id="inf-f" accept=".csv" onchange="showFile(this,'inf-l')">
-        <div class="flbl" id="inf-l"></div>
+  <!-- HEADER -->
+  <header class="hdr">
+    <div class="hdr-left">
+      <div class="brand-icon">N</div>
+      <div>
+        <div class="brand-name">NETRA</div>
+        <div class="brand-sub">Mission Operations Dashboard</div>
       </div>
-      <label class="inp-l">Threshold Override (optional)</label>
-      <input class="inp" id="inf-t" type="text" placeholder="e.g. 0.000243">
-      <button class="btn" id="btn-inf" type="submit">Analyze Telemetry</button>
-    </form>
+    </div>
+    <div class="hdr-center">
+      <div class="pill p-live" id="stream-status-pill"><span class="dot"></span>STREAM DISCONNECTED</div>
+      <div style="color:var(--ts);font-family:var(--mono);font-size:10px;margin-left:10px" id="clock">--:--:-- UTC</div>
+      <div class="pill p-crit"><span class="dot"></span><span id="hcrit">0 CRIT</span></div>
+      <div class="pill p-warn"><span class="dot"></span><span id="hwarn">0 WARN</span></div>
+      <div class="pill p-nom"><span class="dot"></span><span id="hnom">0 NOM</span></div>
+    </div>
+    <div class="hdr-right">
+      <div class="sys-s"><span class="dot" id="api-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></span>API <strong id="api-txt" style="color:var(--red)">OFFLINE</strong></div>
+      <div class="sys-s"><span class="dot" id="mdl-dot" style="background:var(--red);box-shadow:0 0 6px var(--red)"></span>LSTM <strong id="mdl-txt" style="color:var(--red)">UNTRAINED</strong></div>
+      <div class="orbtrix">ORBTRIX</div>
+    </div>
+  </header>
+
+  <!-- TICKER -->
+  <div class="ticker">
+    <div class="ticker-inner" id="ticker">
+      <div class="ti"><span class="tc">[PASS]</span>NTR-01 acquired by BLR-01 · downlink 38.4 Mbps</div>
+      <div class="ti"><span class="tw">[ECLIPSE]</span>NTR-03 entered Earth shadow · expected 19m</div>
+      <div class="ti"><span class="tg">[SAFE]</span>NTR-06 ADCS flagged · investigation underway</div>
+      <div class="ti"><span class="tc">[TLE]</span>NTR-04 TLE refreshed from 18 SDS · ΔV 0.004 m/s</div>
+      <div class="ti"><span class="tr">[ANOMALY]</span>Power deviation detected — awaiting analysis</div>
+      <div class="ti"><span class="tg">[NOMINAL]</span>Battery health within expected range</div>
+      <div class="ti"><span class="tw">[THERMAL]</span>Panel-2 temperature trending +2.3°C above baseline</div>
+      <!-- Duplicate for infinite marquee loop -->
+      <div class="ti"><span class="tc">[PASS]</span>NTR-01 acquired by BLR-01 · downlink 38.4 Mbps</div>
+      <div class="ti"><span class="tw">[ECLIPSE]</span>NTR-03 entered Earth shadow · expected 19m</div>
+      <div class="ti"><span class="tg">[SAFE]</span>NTR-06 ADCS flagged · investigation underway</div>
+      <div class="ti"><span class="tc">[TLE]</span>NTR-04 TLE refreshed from 18 SDS · ΔV 0.004 m/s</div>
+      <div class="ti"><span class="tr">[ANOMALY]</span>Power deviation detected — awaiting analysis</div>
+      <div class="ti"><span class="tg">[NOMINAL]</span>Battery health within expected range</div>
+      <div class="ti"><span class="tw">[THERMAL]</span>Panel-2 temperature trending +2.3°C above baseline</div>
+    </div>
   </div>
 
-  <!-- TRAINING -->
-  <div class="card">
-    <div class="sec-t" style="padding:0 0 6px;margin-bottom:6px;cursor:pointer" onclick="toggleTrain()">
-      Advanced Training <span id="tr-icon" style="float:right">▶</span>
-    </div>
-    <div id="tr-desk" style="display:none">
-      <form id="tr-form" onsubmit="doTrain(event)">
-        <div class="zone" style="padding:8px" onclick="document.getElementById('tr-seg').click()">
-          📁 segments.csv
-          <input type="file" id="tr-seg" onchange="showFile(this,'tr-sl')">
-          <div class="flbl" id="tr-sl"></div>
-        </div>
-        <div class="zone" style="padding:8px;margin-top:5px" onclick="document.getElementById('tr-ds').click()">
-          📁 dataset.csv
-          <input type="file" id="tr-ds" onchange="showFile(this,'tr-dl')">
-          <div class="flbl" id="tr-dl"></div>
-        </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px">
-          <div><label class="inp-l">Window</label><input class="inp" id="tr-len" type="number" value="100"></div>
-          <div><label class="inp-l">Latent</label><input class="inp" id="tr-lat" type="number" value="64"></div>
-          <div><label class="inp-l">Epochs</label><input class="inp" id="tr-ep" type="number" value="50"></div>
-          <div><label class="inp-l">Batch</label><input class="inp" id="tr-bt" type="number" value="32"></div>
-        </div>
-        <button class="btn" id="btn-tr" type="submit" style="background:linear-gradient(135deg,var(--green),#16a34a)">Train Model</button>
-      </form>
-    </div>
-  </div>
+  <!-- LAYOUT -->
+  <div class="layout">
 
-  <!-- JOBS -->
-  <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;margin-top:6px">
-    <div class="sec-t" style="padding:0 0 6px">Active Jobs</div>
-    <div id="job-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
-      <div style="font-size:9px;color:var(--tm);text-align:center;padding:10px">No active jobs</div>
-    </div>
-  </div>
-</aside>
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sec-t">OPS NAVIGATION</div>
+      <div class="nav-i active" data-view="fleet" onclick="showView('fleet')">Fleet Operations</div>
+      <div class="nav-i" data-view="streams" onclick="showView('streams')">Telemetry Streams</div>
+      <div class="nav-i" data-view="alerts" onclick="showView('alerts')">Alerts &amp; Incidents</div>
+      <div class="nav-i" data-view="replay" onclick="showView('replay')">Telemetry Replay</div>
+      
+      <div class="sec-t">INTELLIGENCE</div>
+      <div class="nav-i" data-view="anomaly" onclick="showView('anomaly')">Anomaly Detection</div>
+      <div class="nav-i" data-view="trend" onclick="showView('trend')">Trend Analysis</div>
+      <div class="nav-i" data-view="diag" onclick="showView('diag')">AI Diagnostics</div>
+      <div class="nav-i" data-view="copilot" onclick="toggleCopilot()">AI Copilot</div>
+      
+      <div class="sec-t">ADMINISTRATION</div>
+      <div class="nav-i" data-view="training" onclick="showView('training')">Model Training</div>
+      <div class="nav-i" data-view="perf" onclick="showView('perf')">Performance Metrics</div>
 
-<!-- CENTER -->
-<main class="center">
-  <div class="c-hdr">
-    <div class="c-title">Mission Monitor · Power &amp; Telemetry</div>
-    <div class="c-stats">
-      <div class="c-stat">CHANNELS: <strong id="cs-ch">0</strong></div>
-      <div class="c-stat">ANOMALIES: <strong id="cs-an">0</strong></div>
-      <div class="c-stat">LAST RUN: <strong id="cs-t">--:--:--</strong></div>
-    </div>
-  </div>
-  <!-- VIEW: Fleet Operations (default) -->
-  <div class="scroll" id="view-fleet">
-    <div class="kpi-row">
-      <div class="kpi" id="kpi-seg"><div class="kpi-l">Total Segments</div><div class="kpi-v" id="kv-seg">--</div><div class="kpi-s">analysed this run</div></div>
-      <div class="kpi" id="kpi-an"><div class="kpi-l">Anomalies Detected</div><div class="kpi-v" id="kv-an">--</div><div class="kpi-s" id="ks-an">-- %</div></div>
-      <div class="kpi" id="kpi-mx"><div class="kpi-l">Max Reconstruction Error</div><div class="kpi-v" id="kv-mx">--</div><div class="kpi-s">MSE peak</div></div>
-      <div class="kpi" id="kpi-th"><div class="kpi-l">Detection Threshold</div><div class="kpi-v" id="kv-th">--</div><div class="kpi-s">F2-optimised</div></div>
-    </div>
-    <div class="alert" id="alert" style="background:rgba(34,197,94,.06);border-color:rgba(34,197,94,.2);color:var(--green)">
-      <div><div class="alert-status">NOMINAL</div><div class="alert-msg">Upload a telemetry CSV and click Analyze Telemetry to begin.</div></div>
-    </div>
-    <div>
-      <div class="sec-line" style="margin-bottom:8px">Battery Health Status</div>
-      <div class="health">
-        <div style="flex:1">
-          <div class="h-title">Overall Battery Condition</div>
-          <div class="h-status" id="h-status" style="color:var(--green)">AWAITING DATA</div>
-        </div>
-        <div style="flex:2">
-          <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--tm);margin-bottom:4px;font-family:var(--mono)">
-            <span>HEALTH</span><span id="h-pct">--%</span>
+      <!-- HISTORICAL RUN ANALYSIS -->
+      <div class="card">
+        <div class="sec-t" style="padding:0 0 6px;margin-bottom:6px">Historical Upload</div>
+        <form id="inf-form" onsubmit="doInference(event)">
+          <div class="zone" onclick="document.getElementById('inf-f').click()">
+            📁 Drop CSV or Click
+            <input type="file" id="inf-f" accept=".csv" onchange="showFile(this,'inf-l')">
+            <div class="flbl" id="inf-l"></div>
           </div>
-          <div class="bar-bg"><div class="bar-fill" id="h-bar" style="width:0%;background:var(--green)"></div></div>
-        </div>
-        <div class="h-metrics">
-          <div><div class="h-m-v" id="h-v">--</div><div class="h-m-l">Avg Voltage</div></div>
-          <div><div class="h-m-v" id="h-c">--</div><div class="h-m-l">Avg Current</div></div>
-          <div><div class="h-m-v" id="h-t">--</div><div class="h-m-l">Est Temp</div></div>
+          <label class="inp-l">Threshold Override</label>
+          <input class="inp" id="inf-t" type="text" placeholder="e.g. 0.000243">
+          <button class="btn" id="btn-inf" type="submit">Analyze Telemetry</button>
+        </form>
+      </div>
+
+      <!-- ACTIVE JOBS MONITOR -->
+      <div style="flex:1;display:flex;flex-direction:column;overflow:hidden;margin-top:6px">
+        <div class="sec-t" style="padding:0 0 6px">Active Jobs</div>
+        <div id="job-list" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:4px">
+          <div style="font-size:9px;color:var(--tm);text-align:center;padding:10px" data-empty>No active tasks</div>
         </div>
       </div>
-    </div>
-    <div>
-      <div class="sec-line" style="margin-bottom:8px">Live Power Parameters</div>
-      <div class="param-grid">
-        <div class="pc" style="--pc:#8ab4c8">
-          <div class="pc-hdr"><div><div class="pc-name">Battery Voltage</div><div class="pc-live"><div class="pc-val" id="pv-bv">--</div><div class="pc-unit">V</div></div></div>
-          <div><div class="pc-badge" id="pb-bv">NOMINAL</div></div></div>
-          <div class="pc-chart" id="pc-bv"></div>
-        </div>
-        <div class="pc" style="--pc:#c77a2b">
-          <div class="pc-hdr"><div><div class="pc-name">Battery Temperature</div><div class="pc-live"><div class="pc-val" id="pv-bt">--</div><div class="pc-unit">°C</div></div></div>
-          <div><div class="pc-badge" id="pb-bt">NOMINAL</div></div></div>
-          <div class="pc-chart" id="pc-bt"></div>
-        </div>
-        <div class="pc" style="--pc:#d29922">
-          <div class="pc-hdr"><div><div class="pc-name">Solar Panel Voltage</div><div class="pc-live"><div class="pc-val" id="pv-sv">--</div><div class="pc-unit">V</div></div></div>
-          <div><div class="pc-badge" id="pb-sv">NOMINAL</div></div></div>
-          <div class="pc-chart" id="pc-sv"></div>
-        </div>
-        <div class="pc" style="--pc:#3fb950">
-          <div class="pc-hdr"><div><div class="pc-name">Solar Panel Current</div><div class="pc-live"><div class="pc-val" id="pv-sc">--</div><div class="pc-unit">mA</div></div></div>
-          <div><div class="pc-badge" id="pb-sc">NOMINAL</div></div></div>
-          <div class="pc-chart" id="pc-sc"></div>
-        </div>
-        <div class="pc" style="--pc:#7c67b3">
-          <div class="pc-hdr"><div><div class="pc-name">Bus Current</div><div class="pc-live"><div class="pc-val" id="pv-bc">--</div><div class="pc-unit">mA</div></div></div>
-          <div><div class="pc-badge" id="pb-bc">NOMINAL</div></div></div>
-          <div class="pc-chart" id="pc-bc"></div>
-        </div>
-        <div class="pc" style="--pc:#f85149">
-          <div class="pc-hdr"><div><div class="pc-name">AI Reconstruction Error</div><div class="pc-live"><div class="pc-val" id="pv-re">--</div><div class="pc-unit">MSE</div></div></div>
-          <div><div class="pc-badge" id="pb-re">NOMINAL</div></div></div>
-          <div class="pc-chart" id="pc-re"></div>
+    </aside>
+
+    <!-- CENTER OPERATION PLATFORM -->
+    <main class="center">
+      <div class="c-hdr">
+        <div class="c-title">Mission Monitor · Power &amp; Telemetry</div>
+        <div class="c-stats">
+          <div class="c-stat">CHANNELS: <strong id="cs-ch">0</strong></div>
+          <div class="c-stat">ANOMALIES: <strong id="cs-an">0</strong></div>
+          <div class="c-stat">LAST UPDATE: <strong id="cs-t">--:--:--</strong></div>
         </div>
       </div>
-    </div>
-  </div><!-- /view-fleet -->
 
-  <!-- VIEW: Telemetry Streams -->
-  <div class="scroll" id="view-streams" style="display:none">
-    <div class="sec-line" style="margin-bottom:10px">Live Channel Readings</div>
-    <div style="font-size:9px;color:var(--ts);font-family:var(--mono);margin-bottom:8px">Updating every second · <span id="stm-upd">--</span></div>
-    <div style="overflow-x:auto">
-      <table id="stm-tbl" style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
-        <thead>
-          <tr style="border-bottom:1px solid var(--border)">
-            <th style="text-align:left;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">CHANNEL</th>
-            <th style="text-align:right;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">VALUE</th>
-            <th style="text-align:right;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">MSE</th>
-            <th style="text-align:right;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">ΔVAL</th>
-            <th style="text-align:center;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">STATUS</th>
-            <th style="text-align:right;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">TIMESTAMP</th>
-          </tr>
-        </thead>
-        <tbody id="stm-body" style="color:var(--tp)"></tbody>
-      </table>
-    </div>
-  </div>
+      <!-- VIEW: Fleet Operations -->
+      <div class="scroll" id="view-fleet">
+        
+        <!-- KPI Metrics -->
+        <div class="kpi-row">
+          <div class="kpi" id="kpi-seg"><div class="kpi-l">Total Segments</div><div class="kpi-v" id="kv-seg">--</div><div class="kpi-s">analysed in database</div></div>
+          <div class="kpi" id="kpi-an"><div class="kpi-l">Anomalies Detected</div><div class="kpi-v" id="kv-an">--</div><div class="kpi-s" id="ks-an">-- %</div></div>
+          <div class="kpi" id="kpi-mx"><div class="kpi-l">Max Reconstruction Error</div><div class="kpi-v" id="kv-mx">--</div><div class="kpi-s">MSE peak</div></div>
+          <div class="kpi" id="kpi-th"><div class="kpi-l">Detection Threshold</div><div class="kpi-v" id="kv-th">--</div><div class="kpi-s">LSTM cutoff</div></div>
+        </div>
 
-  <!-- VIEW: Alerts & Incidents -->
-  <div class="scroll" id="view-alerts" style="display:none">
-    <div class="sec-line" style="margin-bottom:10px">Anomaly Event Log</div>
-    <div id="alerts-content">
-      <div style="font-size:9px;color:var(--tm);text-align:center;padding:30px">No anomaly events recorded. Run inference first.</div>
-    </div>
-  </div>
+        <!-- System Status Alert Bar -->
+        <div class="alert" id="alert" style="background:rgba(0,214,255,.03);border-color:var(--border);color:var(--cyan)">
+          <div>
+            <div class="alert-status">CONSOLE STANDBY</div>
+            <div class="alert-msg">WebSocket stream is disconnected. Start real-time telemetry or upload historical data to begin.</div>
+          </div>
+        </div>
 
-  <!-- VIEW: Telemetry Replay -->
-  <div class="scroll" id="view-replay" style="display:none">
-    <div class="sec-line" style="margin-bottom:10px">Telemetry Replay</div>
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
-      <button onclick="startReplay()" style="background:#1a1f2e;border:1px solid rgba(255,255,255,.1);color:var(--tp);padding:5px 14px;font-size:10px;font-family:var(--mono);border-radius:3px;cursor:pointer">&#9654; Play</button>
-      <button onclick="stopReplay()" style="background:#1a1f2e;border:1px solid rgba(255,255,255,.1);color:var(--tp);padding:5px 14px;font-size:10px;font-family:var(--mono);border-radius:3px;cursor:pointer">&#9646;&#9646; Pause</button>
-      <div style="flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden">
-        <div id="rp-prog" style="height:100%;width:0%;background:var(--cyan);transition:width .5s linear"></div>
-      </div>
-      <span id="rp-pct" style="font-size:9px;color:var(--ts);font-family:var(--mono)">0%</span>
-    </div>
-    <div id="rp-chart" style="height:260px"></div>
-    <div id="rp-select" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap" id="rp-ch-btns"></div>
-  </div>
+        <!-- Live Telemetry Stream Control Panel -->
+        <div class="stream-ctrl">
+          <button class="stream-btn start" id="btn-stream-toggle" onclick="toggleWebSocketStream()">Start Live Stream</button>
+          <span style="color:var(--ts);font-size:10px">|</span>
+          <select id="anomaly-inject-select" class="inp" style="margin-top:0;width:180px;display:inline-block">
+            <option value="">-- Inject Subsystem Failure --</option>
+            <option value="Solar Panel Current">Solar Panel Current Drop</option>
+            <option value="Battery Voltage">Battery Voltage Spike</option>
+            <option value="Battery Temperature">Thermal Runaway Climb</option>
+            <option value="Reaction Wheel Speed">Reaction Wheel RPM Seizure</option>
+            <option value="Transceiver Temp">Transceiver Overheating</option>
+            <option value="Bus Voltage">Regulated Bus Voltage Sag</option>
+          </select>
+          <button class="stream-btn inject" onclick="injectAnomaly()">Trigger Anomaly</button>
+          <div class="stream-status" id="stream-rate-label">Rate: 5 Hz (Adaptive Inference)</div>
+        </div>
 
-  <!-- VIEW: Anomaly Detection Detail -->
-  <div class="scroll" id="view-anomaly" style="display:none">
-    <div class="sec-line" style="margin-bottom:10px">Anomaly Detection — Segment Analysis</div>
-    <div id="anom-detail-content">
-      <div style="font-size:9px;color:var(--tm);text-align:center;padding:30px">Run inference to see per-segment anomaly detail.</div>
-    </div>
-  </div>
+        <!-- 3D Satellite Digital Twin & Battery Panel Container -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          
+          <!-- 3D Satellite Twin -->
+          <div class="sat-panel">
+            <div class="sat-overlay">
+              <span class="sat-label">Interactive Satellite Twin</span>
+              <span class="sat-label" id="sat-subsystem-status" style="color:var(--green)">Status: Operational</span>
+            </div>
+            <div id="sat-canvas-container" class="sat-canvas"></div>
+          </div>
 
-  <!-- VIEW: Trend Analysis -->
-  <div class="scroll" id="view-trend" style="display:none">
-    <div class="sec-line" style="margin-bottom:10px">Rolling Averages &amp; Trend Lines</div>
-    <div id="trend-charts" style="display:flex;flex-direction:column;gap:12px">
-      <div style="font-size:9px;color:var(--tm);text-align:center;padding:30px">Run inference to generate trend analysis.</div>
-    </div>
-  </div>
+          <!-- Battery Health Panel -->
+          <div class="health" style="flex-direction:column;align-items:stretch;justify-content:center;gap:12px">
+            <div>
+              <div class="h-title">Main Battery Pack Health</div>
+              <div class="h-status" id="h-status" style="color:var(--ts)">AWAITING DATA</div>
+            </div>
+            <div>
+              <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--ts);margin-bottom:4px;font-family:var(--mono)">
+                <span>HEALTH POTENTIAL</span><span id="h-pct">--%</span>
+              </div>
+              <div class="bar-bg"><div class="bar-fill" id="h-bar" style="width:0%;background:var(--ts)"></div></div>
+            </div>
+            <div class="h-metrics">
+              <div><div class="h-m-v" id="h-v">--</div><div class="h-m-l">Avg Voltage</div></div>
+              <div><div class="h-m-v" id="h-c">--</div><div class="h-m-l">Avg Current</div></div>
+              <div><div class="h-m-v" id="h-t">--</div><div class="h-m-l">Est Temp</div></div>
+            </div>
+          </div>
 
-  <!-- VIEW: AI Diagnostics -->
-  <div class="scroll" id="view-diag" style="display:none">
-    <div class="sec-line" style="margin-bottom:10px">Model Diagnostics</div>
-    <div style="display:flex;gap:6px;margin-bottom:12px">
-      <button onclick="showDiag('loss')" id="c-d-loss" style="background:rgba(138,180,200,.1);border:none;color:var(--cyan);font-size:9px;font-weight:700;padding:4px 12px;cursor:pointer;border-radius:3px;font-family:var(--mono)">Loss Curve</button>
-      <button onclick="showDiag('err')"  id="c-d-err"  style="background:none;border:1px solid var(--border);color:var(--ts);font-size:9px;font-weight:700;padding:4px 12px;cursor:pointer;border-radius:3px;font-family:var(--mono)">Train Error</button>
-      <button onclick="showDiag('test')" id="c-d-test" style="background:none;border:1px solid var(--border);color:var(--ts);font-size:9px;font-weight:700;padding:4px 12px;cursor:pointer;border-radius:3px;font-family:var(--mono)">Test Error</button>
-    </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:4px;padding:12px;min-height:300px;display:flex;align-items:center;justify-content:center">
-      <div id="c-d-ph" style="font-size:9px;color:var(--tm);text-align:center">Loading diagnostics…</div>
-      <img id="c-d-img" style="max-width:100%;max-height:400px;border-radius:4px;display:none">
-    </div>
-  </div>
+        </div>
 
-  <!-- VIEW: Model Training -->
-  <div class="scroll" id="view-training" style="display:none">
-    <div class="sec-line" style="margin-bottom:10px">Model Training</div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:4px;padding:16px;max-width:600px">
-      <form onsubmit="doTrain(event)" style="display:flex;flex-direction:column;gap:12px">
+        <!-- Parameter Graphs Grid -->
         <div>
-          <label class="inp-l">Segments CSV</label>
-          <input class="inp" id="tr-seg2" type="file" accept=".csv,.json">
+          <div class="sec-line" style="margin-bottom:8px">Satellite Power Subsystem Telemetry</div>
+          <div class="param-grid">
+            <div class="pc" id="pc-card-Solar-Panel-Current" style="--pc-color:#3fb950">
+              <div class="pc-hdr">
+                <div>
+                  <div class="pc-name">Solar Panel Current</div>
+                  <div class="pc-live"><div class="pc-val" id="pv-Solar-Panel-Current">--</div><div class="pc-unit">A</div></div>
+                </div>
+                <div><div class="pc-badge" id="pb-Solar-Panel-Current">NOMINAL</div></div>
+              </div>
+              <div class="pc-chart" id="pc-Solar-Panel-Current"></div>
+            </div>
+            
+            <div class="pc" id="pc-card-Battery-Voltage" style="--pc-color:#8ab4c8">
+              <div class="pc-hdr">
+                <div>
+                  <div class="pc-name">Battery Voltage</div>
+                  <div class="pc-live"><div class="pc-val" id="pv-Battery-Voltage">--</div><div class="pc-unit">V</div></div>
+                </div>
+                <div><div class="pc-badge" id="pb-Battery-Voltage">NOMINAL</div></div>
+              </div>
+              <div class="pc-chart" id="pc-Battery-Voltage"></div>
+            </div>
+
+            <div class="pc" id="pc-card-Battery-Temperature" style="--pc-color:#c77a2b">
+              <div class="pc-hdr">
+                <div>
+                  <div class="pc-name">Battery Temperature</div>
+                  <div class="pc-live"><div class="pc-val" id="pv-Battery-Temperature">--</div><div class="pc-unit">°C</div></div>
+                </div>
+                <div><div class="pc-badge" id="pb-Battery-Temperature">NOMINAL</div></div>
+              </div>
+              <div class="pc-chart" id="pc-Battery-Temperature"></div>
+            </div>
+
+            <div class="pc" id="pc-card-Reaction-Wheel-Speed" style="--pc-color:#7c67b3">
+              <div class="pc-hdr">
+                <div>
+                  <div class="pc-name">Reaction Wheel Speed</div>
+                  <div class="pc-live"><div class="pc-val" id="pv-Reaction-Wheel-Speed">--</div><div class="pc-unit">RPM</div></div>
+                </div>
+                <div><div class="pc-badge" id="pb-Reaction-Wheel-Speed">NOMINAL</div></div>
+              </div>
+              <div class="pc-chart" id="pc-Reaction-Wheel-Speed"></div>
+            </div>
+
+            <div class="pc" id="pc-card-Transceiver-Temp" style="--pc-color:#d29922">
+              <div class="pc-hdr">
+                <div>
+                  <div class="pc-name">Transceiver Temp</div>
+                  <div class="pc-live"><div class="pc-val" id="pv-Transceiver-Temp">--</div><div class="pc-unit">°C</div></div>
+                </div>
+                <div><div class="pc-badge" id="pb-Transceiver-Temp">NOMINAL</div></div>
+              </div>
+              <div class="pc-chart" id="pc-Transceiver-Temp"></div>
+            </div>
+
+            <div class="pc" id="pc-card-Bus-Voltage" style="--pc-color:#f59e0b">
+              <div class="pc-hdr">
+                <div>
+                  <div class="pc-name">Bus Voltage</div>
+                  <div class="pc-live"><div class="pc-val" id="pv-Bus-Voltage">--</div><div class="pc-unit">V</div></div>
+                </div>
+                <div><div class="pc-badge" id="pb-Bus-Voltage">NOMINAL</div></div>
+              </div>
+              <div class="pc-chart" id="pc-Bus-Voltage"></div>
+            </div>
+          </div>
         </div>
-        <div>
-          <label class="inp-l">Dataset CSV</label>
-          <input class="inp" id="tr-ds2" type="file" accept=".csv">
+
+      </div><!-- /view-fleet -->
+
+      <!-- VIEW: Telemetry Streams -->
+      <div class="scroll" id="view-streams" style="display:none">
+        <div class="sec-line" style="margin-bottom:10px">Live Channel Feed</div>
+        <div style="font-size:9px;color:var(--ts);font-family:var(--mono);margin-bottom:8px">Updates at WebSocket sample rate · <span id="stm-upd">--</span></div>
+        <div style="overflow-x:auto">
+          <table id="stm-tbl" style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
+            <thead>
+              <tr style="border-bottom:1px solid var(--border)">
+                <th style="text-align:left;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">CHANNEL</th>
+                <th style="text-align:right;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">CURRENT VALUE</th>
+                <th style="text-align:right;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">MSE</th>
+                <th style="text-align:right;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">RUNNING Δ</th>
+                <th style="text-align:center;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">ML CLASSIFICATION</th>
+                <th style="text-align:right;padding:5px 8px;color:var(--ts);font-weight:600;letter-spacing:1px;font-size:8px">SYSTEM TIMESTAMP</th>
+              </tr>
+            </thead>
+            <tbody id="stm-body" style="color:var(--tp)"></tbody>
+          </table>
         </div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
-          <div><label class="inp-l">Window</label><input class="inp" id="tr-len2" type="number" value="100"></div>
-          <div><label class="inp-l">Latent</label><input class="inp" id="tr-lat2" type="number" value="64"></div>
-          <div><label class="inp-l">Epochs</label><input class="inp" id="tr-ep2" type="number" value="50"></div>
-          <div><label class="inp-l">Batch</label><input class="inp" id="tr-bt2" type="number" value="32"></div>
+      </div>
+
+      <!-- VIEW: Alerts & Incidents -->
+      <div class="scroll" id="view-alerts" style="display:none">
+        <div class="sec-line" style="margin-bottom:10px">Incident Event Log</div>
+        <div id="alerts-content">
+          <div style="font-size:9px;color:var(--tm);text-align:center;padding:30px">No active events recorded. Connect to stream or run inference.</div>
         </div>
-        <button class="btn" id="btn-tr2" type="submit">Train Model</button>
-      </form>
-    </div>
-  </div>
+      </div>
 
-  <!-- VIEW: Performance Metrics -->
-  <div class="scroll" id="view-perf" style="display:none">
-    <div class="sec-line" style="margin-bottom:10px">Model Performance Metrics</div>
-    <div id="perf-content">
-      <div style="font-size:9px;color:var(--tm);text-align:center;padding:30px">Loading metadata…</div>
-    </div>
-  </div>
+      <!-- VIEW: Telemetry Replay -->
+      <div class="scroll" id="view-replay" style="display:none">
+        <div class="sec-line" style="margin-bottom:10px">Inference Playback Console</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+          <button class="stream-btn start" onclick="startReplay()">Play</button>
+          <button class="stream-btn stop" onclick="stopReplay()">Pause</button>
+          <div style="flex:1;height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+            <div id="rp-prog" style="height:100%;width:0%;background:var(--cyan);transition:width .5s linear"></div>
+          </div>
+          <span id="rp-pct" style="font-size:9px;color:var(--ts);font-family:var(--mono)">0%</span>
+        </div>
+        <div id="rp-chart" style="height:260px"></div>
+        <div id="rp-select" style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"></div>
+      </div>
 
-</main>
+      <!-- VIEW: Anomaly Detection Details -->
+      <div class="scroll" id="view-anomaly" style="display:none">
+        <div class="sec-line" style="margin-bottom:10px">Subsystem Error Density (MSE Scatter)</div>
+        <div id="anom-detail-content">
+          <div style="font-size:9px;color:var(--tm);text-align:center;padding:30px">Upload historical data or stream live telemetry to populate scatter plot.</div>
+        </div>
+      </div>
 
+      <!-- VIEW: Trend Analysis -->
+      <div class="scroll" id="view-trend" style="display:none">
+        <div class="sec-line" style="margin-bottom:10px">Rolling Averages &amp; System Regression Lines</div>
+        <div id="trend-charts" style="display:flex;flex-direction:column;gap:12px">
+          <div style="font-size:9px;color:var(--tm);text-align:center;padding:30px">Data compilation in progress...</div>
+        </div>
+      </div>
 
-<!-- RIGHT PANEL -->
-<aside class="right">
-  <div class="psec" style="flex:1.6">
-    <div class="phdr">
-      <div class="pttl">Active Anomalies</div>
-      <div style="font-size:9px;color:var(--cyan)" id="an-badge">0 Active</div>
+      <!-- VIEW: AI Diagnostics -->
+      <div class="scroll" id="view-diag" style="display:none">
+        <div class="sec-line" style="margin-bottom:10px">Advanced Neural Net Plots</div>
+        <div style="display:flex;gap:6px;margin-bottom:12px">
+          <button onclick="showDiag('loss')" id="c-d-loss" class="stream-btn start">Loss Curve</button>
+          <button onclick="showDiag('err')"  id="c-d-err"  class="stream-btn inject">Train Error Distribution</button>
+          <button onclick="showDiag('test')" id="c-d-test" class="stream-btn inject">Test Error Distribution</button>
+        </div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:12px;min-height:300px;display:flex;align-items:center;justify-content:center">
+          <div id="c-d-ph" style="font-size:9px;color:var(--tm);text-align:center">No diagnostics loaded.</div>
+          <img id="c-d-img" style="max-width:100%;max-height:400px;border-radius:6px;display:none">
+        </div>
+      </div>
+
+      <!-- VIEW: Model Training -->
+      <div class="scroll" id="view-training" style="display:none">
+        <div class="sec-line" style="margin-bottom:10px">Model Re-Training Configuration</div>
+        <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:6px;padding:16px;max-width:600px">
+          <form onsubmit="doTrain(event)" style="display:flex;flex-direction:column;gap:12px">
+            <div>
+              <label class="inp-l">Segment Sequence File (.csv or .json)</label>
+              <input class="inp" id="tr-seg" type="file" accept=".csv,.json">
+            </div>
+            <div>
+              <label class="inp-l">Raw Telemetry Dataset (.csv)</label>
+              <input class="inp" id="tr-ds" type="file" accept=".csv">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+              <div><label class="inp-l">Sliding Window Size</label><input class="inp" id="tr-len" type="number" value="100"></div>
+              <div><label class="inp-l">Latent Dimension</label><input class="inp" id="tr-lat" type="number" value="64"></div>
+              <div><label class="inp-l">Epochs</label><input class="inp" id="tr-ep" type="number" value="50"></div>
+              <div><label class="inp-l">Batch Size</label><input class="inp" id="tr-bt" type="number" value="32"></div>
+            </div>
+            <button class="btn btn-green" id="btn-tr" type="submit">Execute Training Routine</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- VIEW: Performance Metrics -->
+      <div class="scroll" id="view-perf" style="display:none">
+        <div class="sec-line" style="margin-bottom:10px">LSTM Model Verification Statistics</div>
+        <div id="perf-content">
+          <div style="font-size:9px;color:var(--ts);text-align:center;padding:30px">Retrieving statistics from training runs...</div>
+        </div>
+      </div>
+    </main>
+
+    <!-- RIGHT STATUS OVERLAY -->
+    <aside class="right">
+      
+      <!-- Active Incident Console -->
+      <div class="psec" style="flex:1.5">
+        <div class="phdr">
+          <div class="pttl">Telemetry Incident Console</div>
+          <div style="font-size:9px;color:var(--cyan)" id="an-badge">0 Active</div>
+        </div>
+        <div class="pcnt" id="an-panel" style="padding:10px">
+          <div style="font-size:9px;color:var(--tm);text-align:center;padding:20px">No incidents flagged.</div>
+        </div>
+      </div>
+
+      <!-- Quick AI Plot Diagnostic View -->
+      <div class="psec" style="flex:1.2">
+        <div class="phdr">
+          <div class="pttl">Model Loss Diagnostic</div>
+          <div style="display:flex;gap:3px">
+            <button onclick="showDiag('loss')" id="d-loss" style="background:rgba(0,212,255,.1);border:none;color:var(--cyan);font-size:8px;font-weight:700;padding:2px 7px;cursor:pointer;border-radius:2px">Loss</button>
+            <button onclick="showDiag('err')"  id="d-err"  style="background:none;border:none;color:var(--ts);font-size:8px;font-weight:700;padding:2px 7px;cursor:pointer;border-radius:2px">Train</button>
+            <button onclick="showDiag('test')" id="d-test" style="background:none;border:none;color:var(--ts);font-size:8px;font-weight:700;padding:2px 7px;cursor:pointer;border-radius:2px">Test</button>
+          </div>
+        </div>
+        <div class="pcnt" style="display:flex;align-items:center;justify-content:center;overflow:hidden">
+          <div id="d-ph" style="font-size:9px;color:var(--tm);text-align:center">No diagnostics loaded.</div>
+          <img id="d-img" style="max-width:100%;max-height:100%;border-radius:4px;display:none">
+        </div>
+      </div>
+
+      <!-- Mission Event Stream -->
+      <div class="psec" style="flex:1">
+        <div class="phdr">
+          <div class="pttl">Telemetry Event Log</div>
+          <div style="font-size:8px;color:var(--green);font-family:var(--mono)">● STREAM LIVE</div>
+        </div>
+        <div class="pcnt" id="ev-stream" style="overflow-y:auto;padding:8px">
+          <div class="ev"><span class="et ok">[SYSTEM]</span>Consoles initialized nominal.</div>
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /layout -->
+
+  <!-- COPILOT SLIDEOUT PANEL -->
+  <div id="copilot">
+    <div class="co-hdr">
+      <div class="pttl">AI Flight Diagnostics Copilot</div>
+      <button onclick="toggleCopilot()" style="background:none;border:none;color:var(--ts);cursor:pointer;font-size:16px">✕</button>
     </div>
-    <div class="pcnt" id="an-panel">
-      <div style="font-size:9px;color:var(--tm);text-align:center;padding:20px">No anomalies detected</div>
-    </div>
-  </div>
-  <div class="psec" style="flex:1">
-    <div class="phdr">
-      <div class="pttl">AI Diagnostics</div>
-      <div style="display:flex;gap:3px">
-        <button onclick="showDiag('loss')" id="d-loss" style="background:rgba(0,212,255,.1);border:none;color:var(--cyan);font-size:8px;font-weight:700;padding:2px 7px;cursor:pointer;border-radius:2px">Loss</button>
-        <button onclick="showDiag('err')"  id="d-err"  style="background:none;border:none;color:var(--ts);font-size:8px;font-weight:700;padding:2px 7px;cursor:pointer;border-radius:2px">Error</button>
-        <button onclick="showDiag('test')" id="d-test" style="background:none;border:none;color:var(--ts);font-size:8px;font-weight:700;padding:2px 7px;cursor:pointer;border-radius:2px">Test</button>
+    <div class="co-msgs" id="co-msgs">
+      <div class="co-msg ai">
+        <div class="co-from">NETRA CO-PILOT</div>
+        <div class="co-text">Operational. Direct system queries to my console to analyze live telemetry anomalies, model states, or health statistics.</div>
       </div>
     </div>
-    <div class="pcnt" style="display:flex;align-items:center;justify-content:center">
-      <div id="d-ph" style="font-size:9px;color:var(--tm);text-align:center">No diagnostics available</div>
-      <img id="d-img" style="max-width:100%;max-height:100%;border-radius:4px;display:none">
+    <div class="co-row">
+      <input class="co-inp" id="co-inp" placeholder="Ask about system logs or models..." onkeydown="if(event.key==='Enter')sendMsg()">
+      <button class="co-send" onclick="sendMsg()">Send</button>
     </div>
   </div>
-  <div class="psec" style="flex:0.7">
-    <div class="phdr">
-      <div class="pttl">Mission Event Stream</div>
-      <div style="font-size:8px;color:var(--green);font-family:var(--mono)">● LIVE</div>
-    </div>
-    <div class="pcnt" id="ev-stream" style="overflow-y:auto">
-      <div class="ev"><span class="et">[SYSTEM]</span>Dashboard initialized</div>
-    </div>
-  </div>
-</aside>
 
-</div><!-- /layout -->
+  <!-- Application Logic (linked to external file to ensure separation) -->
+  <script src="/static/netra-app.js"></script>
 
-<!-- COPILOT PANEL -->
-<div id="copilot">
-  <div class="co-hdr">
-    <div class="pttl">AI Flight Diagnostics Copilot</div>
-    <button onclick="toggleCopilot()" style="background:none;border:none;color:var(--ts);cursor:pointer;font-size:16px">✕</button>
-  </div>
-  <div class="co-msgs" id="co-msgs">
-    <div class="co-msg ai">
-      <div class="co-from">NETRA AI</div>
-      <div class="co-text">Welcome. Upload and analyse telemetry to get real-time insights on anomalies, power health, and mission status.</div>
-    </div>
-  </div>
-  <div class="co-row">
-    <input class="co-inp" id="co-inp" placeholder="Ask about anomalies, channels, power status…" onkeydown="if(event.key==='Enter')sendMsg()">
-    <button class="co-send" onclick="sendMsg()">Send</button>
-  </div>
-</div>
-
-<script>
-const API = '';
-let db = {}, anomDb = [], runId = null, diagTab = 'loss', pollT = null;
-
-// Clock
-setInterval(()=>{
-  document.getElementById('clock').textContent =
-    new Date().toUTCString().split(' ')[4] + ' UTC';
-}, 1000);
-
-// Health checks
-function checkAPI(){
-  fetch(`${API}/health`).then(r=>{
-    const ok = r.ok;
-    setDot('api-dot','api-txt', ok ? 'ONLINE' : 'OFFLINE', ok);
-  }).catch(()=>setDot('api-dot','api-txt','OFFLINE',false));
-}
-function checkModel(){
-  fetch(`${API}/status`).then(r=>r.json()).then(d=>{
-    setDot('mdl-dot','mdl-txt', d.trained ? 'TRAINED':'UNTRAINED', d.trained);
-    if(d.trained){
-      document.getElementById('kv-th').textContent = d.threshold ? d.threshold.toExponential(2):'--';
-      updateDiag();
-    }
-  }).catch(()=>setDot('mdl-dot','mdl-txt','UNTRAINED',false));
-}
-function setDot(dotId, txtId, label, ok){
-  const c = ok ? 'var(--green)' : 'var(--red)';
-  const dot = document.getElementById(dotId);
-  dot.style.background = c; dot.style.boxShadow = `0 0 6px ${c}`;
-  const txt = document.getElementById(txtId);
-  txt.textContent = label; txt.style.color = c;
-}
-checkAPI(); checkModel();
-setInterval(checkAPI, 6000); setInterval(checkModel, 15000);
-
-// Helpers
-function showFile(inp, id){ document.getElementById(id).textContent = inp.files[0]?.name || ''; }
-function addEv(tag, msg, cls=''){
-  const s = document.getElementById('ev-stream');
-  const el = document.createElement('div'); el.className='ev';
-  el.innerHTML = `<span class="et ${cls}">[${tag}]</span>${msg}`;
-  s.insertBefore(el, s.firstChild);
-  if(s.children.length > 60) s.removeChild(s.lastChild);
-}
-function toggleTrain(){
-  const d = document.getElementById('tr-desk');
-  const i = document.getElementById('tr-icon');
-  d.style.display = d.style.display==='none' ? 'block':'none';
-  i.textContent = d.style.display==='none' ? '▶':'▼';
-}
-function toggleCopilot(){
-  const p = document.getElementById('copilot');
-  p.style.display = p.style.display==='none' ? 'flex':'none';
-}
-
-// Jobs
-function addJob(id, kind){
-  const list = document.getElementById('job-list');
-  if(list.querySelector('[data-empty]')) list.innerHTML='';
-  const el = document.createElement('div');
-  el.id=`job-${id}`;
-  el.style.cssText='background:rgba(20,32,58,.6);border:1px solid rgba(56,189,248,.1);border-radius:4px;padding:7px 8px;font-size:9px;font-family:var(--mono)';
-  el.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--cyan);font-weight:700">${kind==='train'?'🚀 TRAIN':'🔬 TEST'}</span><span id="jb-${id}" style="padding:1px 6px;border-radius:2px;font-size:8px;font-weight:700;background:rgba(245,158,11,.12);color:var(--yellow)">RUNNING</span></div><div style="color:var(--tm);font-size:8px;margin-bottom:4px">${id.substring(0,10)}…</div><div style="height:3px;background:#0f2035;border-radius:2px;overflow:hidden"><div id="jp-${id}" style="height:100%;width:100%;background:var(--cyan);animation:prg 1.8s infinite linear"></div></div>`;
-  list.insertAdjacentElement('afterbegin', el);
-}
-function finishJob(id, ok){
-  const b=document.getElementById(`jb-${id}`), p=document.getElementById(`jp-${id}`);
-  if(b){ b.textContent=ok?'DONE':'FAILED'; b.style.background=ok?'rgba(34,197,94,.12)':'rgba(239,68,68,.12)'; b.style.color=ok?'var(--green)':'var(--red)'; }
-  if(p){ p.style.animation='none'; p.style.background=ok?'var(--green)':'var(--red)'; }
-}
-function poll(id, kind){
-  if(pollT) clearInterval(pollT);
-  pollT = setInterval(()=>{
-    fetch(`${API}/jobs/${id}`).then(r=>r.json()).then(job=>{
-      if(job.status==='done'||job.status==='failed'){
-        clearInterval(pollT); pollT=null;
-        finishJob(id, job.status==='done');
-        document.getElementById('btn-inf').disabled=false; document.getElementById('btn-inf').textContent='Analyze Telemetry';
-        document.getElementById('btn-tr').disabled=false;  document.getElementById('btn-tr').textContent='Train Model';
-        if(job.status==='done'){
-          addEv('SUCCESS',`${kind.toUpperCase()} complete`,'ok');
-          checkModel();
-          if(kind==='test') handleResult(job.result);
-        } else { addEv('ERROR', job.error?.substring(0,80)||'Failed','err'); }
-      }
-    }).catch(()=>{});
-  }, 2000);
-}
-
-// Forms
-function doTrain(e){
-  e.preventDefault();
-  const f1=document.getElementById('tr-seg').files[0];
-  const f2=document.getElementById('tr-ds').files[0];
-  if(!f1 || !f2){ alert('Please select both required files for training.'); return; }
-  const fd=new FormData();
-  fd.append('segments_file', f1);
-  fd.append('dataset_file',  f2);
-  const url=`${API}/train?max_len=${document.getElementById('tr-len').value}&epochs=${document.getElementById('tr-ep').value}&batch=${document.getElementById('tr-bt').value}&latent=${document.getElementById('tr-lat').value}`;
-  document.getElementById('btn-tr').disabled=true; document.getElementById('btn-tr').textContent='Launching…';
-  addEv('TRAIN','Training started');
-  fetch(url,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{ addJob(d.job_id,'train'); poll(d.job_id,'train'); }).catch(err=>{ addEv('ERROR',`${err}`,'err'); document.getElementById('btn-tr').disabled=false; document.getElementById('btn-tr').textContent='Train Model'; });
-}
-function doInference(e){
-  e.preventDefault();
-  const f = document.getElementById('inf-f').files[0];
-  if(!f) { alert('Please select a telemetry CSV file first.'); return; }
-  const fd=new FormData();
-  fd.append('telemetry_file', f);
-  const thr=document.getElementById('inf-t').value;
-  let url=`${API}/test`; if(thr) url+=`?threshold=${thr}`;
-  document.getElementById('btn-inf').disabled=true; document.getElementById('btn-inf').textContent='Analyzing…';
-  addEv('INFERENCE','Telemetry analysis started');
-  fetch(url,{method:'POST',body:fd}).then(r=>r.json()).then(d=>{ addJob(d.job_id,'test'); poll(d.job_id,'test'); }).catch(err=>{ addEv('ERROR',`${err}`,'err'); document.getElementById('btn-inf').disabled=false; document.getElementById('btn-inf').textContent='Analyze Telemetry'; });
-}
-
-// Result handling
-function handleResult(result){
-  runId = result.run_id;
-  document.getElementById('cs-t').textContent = new Date().toLocaleTimeString();
-  addEv('DONE',`Run ${result.run_id.substring(0,8)} · ${result.flagged_anomalies} anomalies`,'ok');
-  document.getElementById('kv-seg').textContent = result.total_segments || '--';
-  const na = result.flagged_anomalies || 0;
-  document.getElementById('kv-an').textContent = na;
-  document.getElementById('ks-an').textContent = result.total_segments ? ((na/result.total_segments)*100).toFixed(1)+'%':'--';
-  document.getElementById('kv-th').textContent = result.threshold_used ? result.threshold_used.toExponential(2):'--';
-  if(na>0) document.getElementById('kpi-an').className='kpi '+(na>5?'crit':'warn');
-
-  fetch(`${API}/results/${result.run_id}/all_segments.csv`).then(r=>r.text()).then(csv=>{
-    parseRender(csv, result);
-    updateDiag();
-  });
-}
-
-function parseCSV(txt){
-  const lines=txt.trim().split('\n'), hdrs=lines[0].split(',').map(h=>h.trim());
-  return lines.slice(1).map(ln=>{ const v=ln.split(','),r={}; hdrs.forEach((h,i)=>r[h]=v[i]?.trim()); return r; });
-}
-
-function parseRender(csv, result){
-  const rows=parseCSV(csv);
-  db={}; anomDb=[];
-  let maxErr=0;
-  rows.forEach((row,i)=>{
-    const ch=row.channel||'CH', val=parseFloat(row.value)||0;
-    const err=parseFloat(row.reconstruction_error)||0;
-    const pred=parseInt(row.predicted_anomaly)||0;
-    const sev=row.severity||'Normal', dev=parseFloat(row.deviation_factor)||0;
-    if(!db[ch]) db[ch]={times:[],values:[],errors:[],preds:[],sevs:[]};
-    db[ch].times.push(i); db[ch].values.push(val);
-    db[ch].errors.push(err); db[ch].preds.push(pred); db[ch].sevs.push(sev);
-    if(err>maxErr) maxErr=err;
-    if(pred===1) anomDb.push({i,ch,val,err,sev,dev,seg:row.segment||i});
-  });
-
-  const channels=Object.keys(db);
-  document.getElementById('cs-ch').textContent = channels.length;
-  document.getElementById('cs-an').textContent = anomDb.length;
-  document.getElementById('kv-mx').textContent = maxErr.toExponential(3);
-  document.getElementById('hcrit').textContent = `${anomDb.filter(a=>a.sev==='Severe').length} CRIT`;
-  document.getElementById('hwarn').textContent = `${anomDb.filter(a=>a.sev==='Moderate').length} WARN`;
-  document.getElementById('hnom').textContent  = `${(result.total_segments||0)-anomDb.length} NOM`;
-
-  renderParams(channels);
-  renderAnomalyPanel();
-  renderAlert();
-  renderBatteryHealth(channels);
-}
-
-// ── PARAMETER PANELS ─────────────────────────────────────────────────
-const PARAM_CFG = [
-  {id:'pc-bv', valId:'pv-bv', badgeId:'pb-bv', color:'#8ab4c8', unit:'V',  label:'Battery Voltage',      pick:chs=>chs.find(c=>c.includes('892'))||chs[0]},
-  {id:'pc-bt', valId:'pv-bt', badgeId:'pb-bt', color:'#c77a2b', unit:'°C', label:'Battery Temperature',   pick:chs=>chs.find(c=>c.includes('884'))||chs[1], sim:'temp'},
-  {id:'pc-sv', valId:'pv-sv', badgeId:'pb-sv', color:'#d29922', unit:'V',  label:'Solar Panel Voltage',   pick:chs=>chs.find(c=>c.includes('888'))||chs[2]},
-  {id:'pc-sc', valId:'pv-sc', badgeId:'pb-sc', color:'#3fb950', unit:'mA', label:'Solar Panel Current',   pick:chs=>chs.find(c=>c.includes('894'))||chs[3]},
-  {id:'pc-bc', valId:'pv-bc', badgeId:'pb-bc', color:'#7c67b3', unit:'mA', label:'Bus Current',           pick:chs=>chs.find(c=>c.includes('872'))||chs[4]},
-  {id:'pc-re', valId:'pv-re', badgeId:'pb-re', color:'#f85149', unit:'MSE',label:'AI Reconstruction Error', isError:true},
-];
-
-function renderParams(channels){
-  const layout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
-    margin:{l:28,r:4,t:4,b:18},font:{color:'#6e7681',size:8,family:'JetBrains Mono'},
-    xaxis:{showgrid:false,showticklabels:false,zeroline:false},
-    yaxis:{gridcolor:'rgba(255,255,255,.04)',zeroline:false,tickfont:{size:8}},
-    showlegend:false,hovermode:'x'};
-  const cfg={responsive:true,displayModeBar:false};
-
-  PARAM_CFG.forEach(p=>{
-    const el=document.getElementById(p.id); if(!el) return;
-    let yData, xData, latestVal, hasAnom=false;
-
-    if(p.isError){
-      const all=Object.values(db);
-      if(!all.length){
-        // synthetic error trace
-        yData=Array.from({length:200},(_,i)=>0.00004+0.00003*Math.sin(i/12)+Math.random()*0.00001);
-        xData=Array.from({length:200},(_,i)=>i);
-        latestVal=yData[yData.length-1];
-      } else {
-        const len=Math.max(...all.map(c=>c.errors.length));
-        yData=Array.from({length:len},(_,i)=>Math.max(...all.map(c=>c.errors[i]||0)));
-        xData=Array.from({length:len},(_,i)=>i);
-        latestVal=yData[yData.length-1]||0;
-        hasAnom=anomDb.length>0;
-      }
-      document.getElementById(p.valId).textContent=latestVal.toExponential(3);
-    } else {
-      const ch=p.pick(channels);
-      if(!ch||!db[ch]) return;
-      const d=db[ch];
-      yData = p.sim==='temp' ? d.values.map(v=>20+Math.abs(v)*25+(Math.random()-.5)*.3) : d.values;
-      xData = d.times;
-      latestVal = yData[yData.length-1]||0;
-      hasAnom = d.preds.some(v=>v===1);
-      const fmt = Math.abs(latestVal)<0.01 ? latestVal.toExponential(3) : latestVal.toFixed(4);
-      document.getElementById(p.valId).textContent = fmt;
-    }
-
-    // Badge
-    const badge=document.getElementById(p.badgeId);
-    if(hasAnom){ badge.textContent='ANOMALY'; badge.className='pc-badge crit'; }
-    else { badge.textContent='NOMINAL'; badge.className='pc-badge'; }
-
-    // Anomaly markers
-    const ax=[], ay=[];
-    if(!p.isError){
-      const ch=p.pick(channels);
-      if(ch&&db[ch]) db[ch].preds.forEach((v,i)=>{ if(v===1){ax.push(xData[i]);ay.push(yData[i]);} });
-    }
-
-    const traces=[{x:xData,y:yData,type:'scatter',mode:'lines',
-      line:{color:p.color,width:1.5},fill:'tozeroy',fillcolor:p.color+'18',showlegend:false}];
-    if(ax.length) traces.push({x:ax,y:ay,type:'scatter',mode:'markers',
-      marker:{color:'#ef4444',size:5,symbol:'x'},showlegend:false});
-
-    Plotly.newPlot(p.id, traces, layout, cfg);
-  });
-}
-
-// Render synthetic placeholder charts before any data is uploaded
-function renderSyntheticParams(){
-  const layout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
-    margin:{l:28,r:4,t:4,b:18},font:{color:'#6e7681',size:8,family:'JetBrains Mono'},
-    xaxis:{showgrid:false,showticklabels:false,zeroline:false},
-    yaxis:{gridcolor:'rgba(255,255,255,.04)',zeroline:false,tickfont:{size:8}},
-    showlegend:false};
-  const cfg={responsive:true,displayModeBar:false};
-  const N=200;
-  const synth=[
-    {id:'pc-bv',color:'#8ab4c8',valId:'pv-bv',fn:i=>3.71+0.04*Math.sin(i/18)+Math.random()*0.005},
-    {id:'pc-bt',color:'#c77a2b',valId:'pv-bt',fn:i=>28.3+1.2*Math.sin(i/25)+Math.random()*0.2},
-    {id:'pc-sv',color:'#d29922',valId:'pv-sv',fn:i=>5.02+0.08*Math.sin(i/14)+Math.random()*0.01},
-    {id:'pc-sc',color:'#3fb950',valId:'pv-sc',fn:i=>142+8*Math.sin(i/20)+Math.random()*1.5},
-    {id:'pc-bc',color:'#7c67b3',valId:'pv-bc',fn:i=>187+12*Math.cos(i/16)+Math.random()*2},
-    {id:'pc-re',color:'#f85149',valId:'pv-re',fn:i=>0.000042+0.000018*Math.abs(Math.sin(i/30))+Math.random()*0.000005},
-  ];
-  synth.forEach(p=>{
-    const el=document.getElementById(p.id); if(!el) return;
-    const y=Array.from({length:N},(_,i)=>p.fn(i));
-    const x=Array.from({length:N},(_,i)=>i);
-    const last=y[y.length-1];
-    const valEl=document.getElementById(p.valId);
-    if(valEl) valEl.textContent=Math.abs(last)<0.01?last.toExponential(3):last.toFixed(4);
-    Plotly.newPlot(p.id,[{x,y,type:'scatter',mode:'lines',
-      line:{color:p.color,width:1.5},fill:'tozeroy',fillcolor:p.color+'15',showlegend:false}],
-      layout,cfg);
-  });
-}
-
-// On page load — render synthetic charts + init diagnostics tab
-document.addEventListener('DOMContentLoaded',()=>{
-  renderSyntheticParams();
-  showDiag('loss');
-});
-
-// Battery health
-function renderBatteryHealth(channels){
-  const sineChs=channels.filter(c=>!['872','873','874'].some(n=>c.includes(n)));
-  const ch=sineChs[0]; if(!ch||!db[ch]) return;
-  const vals=db[ch].values;
-  const avg=vals.reduce((a,b)=>a+b,0)/vals.length;
-
-  const std=Math.sqrt(vals.reduce((s,v)=>s+Math.pow(v-avg,2),0)/vals.length);
-  const anomRatio=db[ch].preds.filter(v=>v===1).length/db[ch].preds.length;
-  const hp=Math.max(0,Math.min(100,100-anomRatio*200-std*30));
-  let status, color;
-  if(hp>=80){status='GOOD';color='var(--green)';}
-  else if(hp>=55){status='FAIR';color='var(--yellow)';}
-  else{status='POOR';color='var(--red)';}
-  document.getElementById('h-status').textContent=status;
-  document.getElementById('h-status').style.color=color;
-  document.getElementById('h-pct').textContent=hp.toFixed(1)+'%';
-  document.getElementById('h-bar').style.width=hp+'%';
-  document.getElementById('h-bar').style.background=color;
-  document.getElementById('h-v').textContent=avg.toFixed(4)+'V';
-  document.getElementById('h-c').textContent=(avg*100).toFixed(2)+'mA';
-  document.getElementById('h-t').textContent=(20+Math.abs(avg)*25).toFixed(1)+'°C';
-}
-
-// Alert banner
-function renderAlert(){
-  const banner=document.getElementById('alert');
-  const sev=anomDb.filter(a=>a.sev==='Severe').length;
-  const mod=anomDb.filter(a=>a.sev==='Moderate').length;
-  const mild=anomDb.filter(a=>a.sev==='Mild').length;
-  if(sev>0){
-    banner.style.cssText='padding:8px 14px;border-radius:5px;border:1px solid rgba(239,68,68,.3);display:flex;align-items:center;gap:10px;background:rgba(239,68,68,.06);color:var(--red)';
-    banner.innerHTML=`<div><div class="alert-status">CRITICAL ALERT</div><div class="alert-msg">${sev} severe anomal${sev>1?'ies':'y'} detected — immediate attention required.</div></div>`;
-  } else if(mod>0){
-    banner.style.cssText='padding:8px 14px;border-radius:5px;border:1px solid rgba(245,158,11,.3);display:flex;align-items:center;gap:10px;background:rgba(245,158,11,.06);color:var(--yellow)';
-    banner.innerHTML=`<div><div class="alert-status">WARNING</div><div class="alert-msg">${mod} moderate anomal${mod>1?'ies':'y'} detected.</div></div>`;
-  } else if(mild>0){
-    banner.style.cssText='padding:8px 14px;border-radius:5px;border:1px solid rgba(249,115,22,.25);display:flex;align-items:center;gap:10px;background:rgba(249,115,22,.06);color:var(--orange)';
-    banner.innerHTML=`<div><div class="alert-status">CAUTION</div><div class="alert-msg">${mild} mild anomal${mild>1?'ies':'y'} — monitoring advised.</div></div>`;
-  } else if(Object.keys(db).length>0){
-    banner.style.cssText='padding:8px 14px;border-radius:5px;border:1px solid rgba(34,197,94,.2);display:flex;align-items:center;gap:10px;background:rgba(34,197,94,.06);color:var(--green)';
-    banner.innerHTML=`<div><div class="alert-status">ALL SYSTEMS NOMINAL</div><div class="alert-msg">No anomalies detected across all channels.</div></div>`;
-  }
-}
-
-// Anomaly panel
-function renderAnomalyPanel(){
-  const panel=document.getElementById('an-panel');
-  document.getElementById('an-badge').textContent=`${anomDb.length} Active`;
-  if(!anomDb.length){ panel.innerHTML='<div style="font-size:9px;color:var(--tm);text-align:center;padding:20px">No anomalies detected</div>'; return; }
-  const sorted=[...anomDb].sort((a,b)=>b.err-a.err);
-  panel.innerHTML=sorted.slice(0,20).map(a=>{
-    const cls=a.sev==='Severe'?'sc':a.sev==='Moderate'?'sw':'sm';
-    return `<div class="ai"><div class="ai-hdr"><span class="ai-ch">${a.ch}</span><span class="ai-err">${a.err.toExponential(3)}</span></div><div class="ai-desc">Reconstruction error ${a.dev.toFixed(1)}× threshold</div><div class="ai-meta"><span class="${cls}">${a.sev.toUpperCase()}</span><span>seg ${a.seg}</span></div></div>`;
-  }).join('');
-}
-
-// Diagnostics
-function showDiag(tab){
-  diagTab=tab;
-  ['loss','err','test'].forEach(t=>{
-    const b=document.getElementById(`d-${t}`);
-    const cb=document.getElementById(`c-d-${t}`);
-    if(b){ b.style.background=t===tab?'rgba(0,212,255,.1)':'none'; b.style.color=t===tab?'var(--cyan)':'var(--ts)'; }
-    if(cb){ cb.style.background=t===tab?'rgba(138,180,200,.1)':'none'; cb.style.color=t===tab?'var(--cyan)':'var(--ts)'; }
-  });
-  updateDiag();
-}
-function updateDiag(){
-  const img=document.getElementById('d-img'), ph=document.getElementById('d-ph');
-  const cImg=document.getElementById('c-d-img'), cPh=document.getElementById('c-d-ph');
-  if(ph) ph.style.display='none'; 
-  if(img) img.style.display='none';
-  if(cPh) cPh.style.display='none'; 
-  if(cImg) cImg.style.display='none';
-
-  let src='';
-  if(diagTab==='loss') src=`${API}/model/loss_curve.png`;
-  else if(diagTab==='err') src=`${API}/model/train_error_plot.png`;
-  else if(diagTab==='test'&&runId) src=`${API}/results/${runId}/test_error_plot.png`;
-  else {
-    if(ph) { ph.style.display='block'; ph.textContent='No test results yet'; }
-    if(cPh) { cPh.style.display='block'; cPh.textContent='No test results yet'; }
-    return;
-  }
-  
-  if(img){
-    img.onload=()=>img.style.display='block';
-    img.onerror=()=>{ ph.style.display='block'; ph.textContent='Diagnostic plot not found'; };
-    img.src=`${src}?t=${Date.now()}`;
-  }
-  if(cImg){
-    cImg.onload=()=>cImg.style.display='block';
-    cImg.onerror=()=>{ cPh.style.display='block'; cPh.textContent='Diagnostic plot not found'; };
-    cImg.src=`${src}?t=${Date.now()}`;
-  }
-}
-
-// Copilot
-function sendMsg(){
-  const inp=document.getElementById('co-inp');
-  const msg=inp.value.trim(); if(!msg) return;
-  inp.value='';
-  addCoMsg('YOU',msg,false);
-  fetch(`${API}/api/chat`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:msg})})
-    .then(r=>r.json()).then(d=>addCoMsg('NETRA AI',d.reply||'No response',true))
-    .catch(()=>addCoMsg('NETRA AI',genLocal(msg),true));
-}
-function addCoMsg(from,text,isAi){
-  const msgs=document.getElementById('co-msgs');
-  const el=document.createElement('div'); el.className=`co-msg ${isAi?'ai':'user'}`;
-  el.innerHTML=`<div class="co-from">${from}</div><div class="co-text">${text}</div>`;
-  msgs.appendChild(el); msgs.scrollTop=msgs.scrollHeight;
-}
-function genLocal(msg){
-  const m=msg.toLowerCase(), n=anomDb.length;
-  if(m.includes('anomal')||m.includes('channel')||m.includes('worst')){
-    const w=anomDb.sort((a,b)=>b.err-a.err)[0];
-    return `${n} anomalies detected. ${w?`Worst: ${w.ch} seg ${w.seg}, deviation ${w.dev.toFixed(1)}× (${w.sev}).`:'No anomalies.'}`;
-  }
-  if(m.includes('battery')||m.includes('health')){
-    return `Battery: ${document.getElementById('h-status').textContent}. Avg voltage: ${document.getElementById('h-v').textContent}. Est temp: ${document.getElementById('h-t').textContent}.`;
-  }
-  return `Analysis: ${n} anomalies across ${Object.keys(db).length} channels. Ask about specific severity, channels, or power health.`;
-}
-
-// ── VIEW SYSTEM ──────────────────────────────────────────────────────────────
-const ALL_VIEWS = ['fleet','streams','alerts','replay','anomaly','trend','diag','training','perf'];
-let currentView = 'fleet';
-let streamsTimer = null, replayTimer = null, replayFrame = 0, replayPlaying = false;
-
-function showView(v) {
-  // Update nav highlight
-  document.querySelectorAll('.nav-i[data-view]').forEach(el => {
-    el.classList.toggle('active', el.dataset.view === v);
-  });
-  // Update center header title
-  const titles = {
-    fleet:'Mission Monitor · Power & Telemetry',
-    streams:'Telemetry Streams · Live Channel Feed',
-    alerts:'Alerts & Incidents · Event Log',
-    replay:'Telemetry Replay · Playback',
-    anomaly:'Anomaly Detection · Segment Analysis',
-    trend:'Trend Analysis · Rolling Averages',
-    diag:'AI Diagnostics · Model Plots',
-    training:'Model Training · Configuration',
-    perf:'Performance Metrics · Model Statistics'
-  };
-  document.querySelector('.c-title').textContent = titles[v] || v;
-  // Hide all, show target
-  ALL_VIEWS.forEach(n => {
-    const el = document.getElementById('view-'+n);
-    if (el) el.style.display = (n === v) ? 'flex' : 'none';
-  });
-  // Stop streams ticker if leaving
-  if (v !== 'streams' && streamsTimer) { clearInterval(streamsTimer); streamsTimer = null; }
-  // Dispatch to view init
-  currentView = v;
-  if (v === 'streams')  initStreams();
-  if (v === 'alerts')   renderAlertsView();
-  if (v === 'replay')   initReplay();
-  if (v === 'anomaly')  renderAnomalyDetail();
-  if (v === 'trend')    renderTrendView();
-  if (v === 'diag')     { showDiag('loss'); }
-  if (v === 'perf')     renderPerfView();
-}
-
-// ── TELEMETRY STREAMS ────────────────────────────────────────────────────────
-function initStreams() {
-  tickStreams();
-  if (streamsTimer) clearInterval(streamsTimer);
-  streamsTimer = setInterval(tickStreams, 1000);
-}
-function tickStreams() {
-  const tbody = document.getElementById('stm-body');
-  const now = new Date().toISOString().replace('T',' ').substring(0,19);
-  document.getElementById('stm-upd').textContent = now + ' UTC';
-  const channels = Object.keys(db);
-  if (!channels.length) {
-    // Show plausible synthetic data if no real data loaded
-    const synth = [
-      {ch:'BATT_VOLTAGE_892',  val:3.7142, mse:0.000082, color:'#8ab4c8'},
-      {ch:'BATT_TEMP_884',     val:28.34,  mse:0.000031, color:'#c77a2b'},
-      {ch:'SOLAR_VOLTAGE_888', val:5.0211, mse:0.000019, color:'#d29922'},
-      {ch:'SOLAR_CURRENT_894', val:142.3,  mse:0.000044, color:'#3fb950'},
-      {ch:'BUS_CURRENT_872',   val:187.6,  mse:0.000058, color:'#7c67b3'},
-      {ch:'RECON_ERROR',       val:0.000091,mse:0.000091,color:'#f85149'},
-    ];
-    tbody.innerHTML = synth.map(r => {
-      const jitter = (Math.random()-0.5)*0.002;
-      const v = (r.val + r.val*jitter).toFixed(4);
-      const m = (r.mse*(1+(Math.random()-0.5)*0.3)).toExponential(3);
-      const d = ((Math.random()-0.5)*0.001).toFixed(5);
-      const anom = r.mse > 0.00008;
-      const sc = anom ? 'color:var(--red)' : 'color:var(--green)';
-      const st = anom ? 'ANOMALY' : 'NOMINAL';
-      return `<tr style="border-bottom:1px solid rgba(255,255,255,.03)">
-        <td style="padding:6px 8px;color:var(--cyan);font-weight:600">${r.ch}</td>
-        <td style="padding:6px 8px;text-align:right">${v}</td>
-        <td style="padding:6px 8px;text-align:right;color:var(--ts)">${m}</td>
-        <td style="padding:6px 8px;text-align:right;color:${parseFloat(d)>=0?'var(--green)':'var(--red)'}">${parseFloat(d)>=0?'+':''}${d}</td>
-        <td style="padding:6px 8px;text-align:center;${sc};font-weight:700;font-size:9px">${st}</td>
-        <td style="padding:6px 8px;text-align:right;color:var(--tm)">${now}</td>
-      </tr>`;
-    }).join('');
-    return;
-  }
-  // Real data with jitter
-  const thresh = parseFloat(document.getElementById('kv-th').textContent) || 0.001;
-  tbody.innerHTML = channels.map(ch => {
-    const d = db[ch];
-    const last = d.values[d.values.length-1] || 0;
-    const prev = d.values[d.values.length-2] || last;
-    const jitter = last*(1+(Math.random()-0.5)*0.005);
-    const mse = d.errors[d.errors.length-1] || 0;
-    const delta = jitter - prev;
-    const anom = d.preds[d.preds.length-1] === 1;
-    const sc = anom ? 'color:var(--red)' : 'color:var(--green)';
-    const fmt = v => Math.abs(v)<0.01 ? v.toExponential(3) : v.toFixed(4);
-    return `<tr style="border-bottom:1px solid rgba(255,255,255,.03)">
-      <td style="padding:6px 8px;color:var(--cyan);font-weight:600">${ch}</td>
-      <td style="padding:6px 8px;text-align:right">${fmt(jitter)}</td>
-      <td style="padding:6px 8px;text-align:right;color:var(--ts)">${mse.toExponential(3)}</td>
-      <td style="padding:6px 8px;text-align:right;color:${delta>=0?'var(--green)':'var(--red)'}">${delta>=0?'+':''}${fmt(delta)}</td>
-      <td style="padding:6px 8px;text-align:center;${sc};font-weight:700;font-size:9px">${anom?'ANOMALY':'NOMINAL'}</td>
-      <td style="padding:6px 8px;text-align:right;color:var(--tm)">${now}</td>
-    </tr>`;
-  }).join('');
-}
-
-// ── ALERTS & INCIDENTS ────────────────────────────────────────────────────────
-function renderAlertsView() {
-  const el = document.getElementById('alerts-content');
-  const events = anomDb.length ? anomDb : genSynthAlerts();
-  const sevStyle = s => s==='Severe'?'color:var(--red);background:rgba(248,81,73,.1);border:1px solid rgba(248,81,73,.2)'
-    :s==='Moderate'?'color:var(--yellow);background:rgba(210,153,34,.1);border:1px solid rgba(210,153,34,.2)'
-    :'color:var(--orange);background:rgba(199,122,43,.1);border:1px solid rgba(199,122,43,.2)';
-  const sorted = [...events].sort((a,b) => b.err - a.err).slice(0,40);
-  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-family:var(--mono);font-size:10px">
-    <thead><tr style="border-bottom:1px solid var(--border)">
-      <th style="text-align:left;padding:5px 8px;color:var(--ts);font-size:8px;letter-spacing:1px">TIMESTAMP</th>
-      <th style="text-align:left;padding:5px 8px;color:var(--ts);font-size:8px;letter-spacing:1px">CHANNEL</th>
-      <th style="text-align:right;padding:5px 8px;color:var(--ts);font-size:8px;letter-spacing:1px">MSE</th>
-      <th style="text-align:right;padding:5px 8px;color:var(--ts);font-size:8px;letter-spacing:1px">DEVIATION</th>
-      <th style="text-align:center;padding:5px 8px;color:var(--ts);font-size:8px;letter-spacing:1px">SEVERITY</th>
-      <th style="text-align:left;padding:5px 8px;color:var(--ts);font-size:8px;letter-spacing:1px">SEGMENT</th>
-    </tr></thead>
-    <tbody>${sorted.map((a,i) => {
-      const ts = new Date(Date.now() - i*14000).toISOString().replace('T',' ').substring(0,19);
-      return `<tr style="border-bottom:1px solid rgba(255,255,255,.03)">
-        <td style="padding:6px 8px;color:var(--tm)">${ts}</td>
-        <td style="padding:6px 8px;color:var(--tp);font-weight:600">${a.ch}</td>
-        <td style="padding:6px 8px;text-align:right">${a.err.toExponential(3)}</td>
-        <td style="padding:6px 8px;text-align:right;color:var(--red)">${a.dev.toFixed(1)}×</td>
-        <td style="padding:6px 8px;text-align:center"><span style="padding:2px 7px;border-radius:2px;font-size:8px;font-weight:700;${sevStyle(a.sev)}">${a.sev.toUpperCase()}</span></td>
-        <td style="padding:6px 8px;color:var(--ts)">seg ${a.seg}</td>
-      </tr>`;
-    }).join('')}</tbody>
-  </table>`;
-}
-function genSynthAlerts() {
-  const chs=['BATT_VOLTAGE_892','SOLAR_CURRENT_894','BUS_CURRENT_872','BATT_TEMP_884'];
-  const sevs=['Severe','Moderate','Mild'];
-  return Array.from({length:18},(_,i)=>({
-    ch:chs[i%chs.length], err:0.0008*(1/(i+1))*(1+Math.random()),
-    dev:3.2/(i*0.3+1)*(1+Math.random()*0.5), sev:sevs[Math.min(2,Math.floor(i/5))], seg:i*3+Math.floor(Math.random()*3)
-  }));
-}
-
-// ── TELEMETRY REPLAY ──────────────────────────────────────────────────────────
-let rpChannel = null, rpData = [], rpCfg = {};
-function initReplay() {
-  const channels = Object.keys(db);
-  const btnBox = document.getElementById('rp-select');
-  if (!btnBox) return;
-  if (!channels.length) {
-    // synthetic
-    rpData = Array.from({length:200},(_,i)=>3.65+0.12*Math.sin(i/15)+Math.random()*0.02);
-    rpChannel = 'BATT_VOLTAGE (synthetic)';
-  } else {
-    rpChannel = channels[0];
-    rpData = db[rpChannel].values;
-  }
-  // Channel selector buttons
-  const allChs = channels.length ? channels : [rpChannel];
-  btnBox.innerHTML = allChs.map(c=>`<button onclick="setRpCh('${c}')"
-    style="background:${c===rpChannel?'rgba(138,180,200,.15)':'#111'};border:1px solid ${c===rpChannel?'var(--cyan)':'var(--border)'};color:${c===rpChannel?'var(--cyan)':'var(--ts)'};padding:3px 10px;font-size:9px;font-family:var(--mono);border-radius:2px;cursor:pointer">${c}</button>`).join('');
-  replayFrame = 0;
-  drawReplayFrame(0);
-}
-function setRpCh(ch) {
-  rpChannel = ch; rpData = db[ch]?.values || rpData; replayFrame=0;
-  initReplay();
-}
-function drawReplayFrame(end) {
-  const x = rpData.slice(0,end+1).map((_,i)=>i);
-  const y = rpData.slice(0,end+1);
-  const layout = {
-    paper_bgcolor:'rgba(0,0,0,0)', plot_bgcolor:'rgba(0,0,0,0)',
-    margin:{l:40,r:10,t:10,b:30},
-    font:{color:'#6e7681',size:9,family:'JetBrains Mono'},
-    xaxis:{showgrid:false,zeroline:false,color:'#444c56'},
-    yaxis:{gridcolor:'rgba(255,255,255,.04)',zeroline:false,color:'#444c56'},
-    showlegend:false
-  };
-  const traces = [{x,y,type:'scatter',mode:'lines',line:{color:'#8ab4c8',width:1.5},fill:'tozeroy',fillcolor:'rgba(138,180,200,.08)'}];
-  if (end < rpData.length-1) {
-    traces.push({x:[end],y:[y[end]],type:'scatter',mode:'markers',marker:{color:'#f85149',size:7,symbol:'circle'}});
-  }
-  Plotly.react('rp-chart', traces, layout, {responsive:true,displayModeBar:false});
-  const pct = Math.round((end/(rpData.length-1))*100);
-  document.getElementById('rp-prog').style.width = pct+'%';
-  document.getElementById('rp-pct').textContent = pct+'%';
-}
-function startReplay() {
-  if (replayPlaying) return;
-  replayPlaying = true;
-  replayTimer = setInterval(()=>{
-    if (replayFrame >= rpData.length-1) { stopReplay(); return; }
-    replayFrame += Math.ceil(rpData.length/120);
-    replayFrame = Math.min(replayFrame, rpData.length-1);
-    drawReplayFrame(replayFrame);
-  }, 80);
-}
-function stopReplay() {
-  replayPlaying = false;
-  if (replayTimer) { clearInterval(replayTimer); replayTimer = null; }
-}
-
-// ── ANOMALY DETECTION DETAIL ──────────────────────────────────────────────────
-function renderAnomalyDetail() {
-  const el = document.getElementById('anom-detail-content');
-  const events = anomDb.length ? anomDb : genSynthAlerts();
-  if (!events.length) { el.innerHTML='<div style="font-size:9px;color:var(--tm);text-align:center;padding:30px">No anomalies detected.</div>'; return; }
-
-  // Per-channel summary + mini scatter
-  const byCh = {};
-  events.forEach(a => { if(!byCh[a.ch]) byCh[a.ch]={count:0,maxErr:0,maxDev:0,sevs:[]}; byCh[a.ch].count++; byCh[a.ch].maxErr=Math.max(byCh[a.ch].maxErr,a.err); byCh[a.ch].maxDev=Math.max(byCh[a.ch].maxDev,a.dev); byCh[a.ch].sevs.push(a.sev); });
-
-  el.innerHTML = Object.entries(byCh).map(([ch,d],idx)=>{
-    const domSev = d.sevs.includes('Severe')?'SEVERE':d.sevs.includes('Moderate')?'MODERATE':'MILD';
-    const sc = domSev==='SEVERE'?'var(--red)':domSev==='MODERATE'?'var(--yellow)':'var(--orange)';
-    return `<div style="background:var(--card);border:1px solid var(--border);border-radius:4px;padding:12px;margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-        <span style="font-weight:700;color:var(--tp);font-size:11px;font-family:var(--mono)">${ch}</span>
-        <span style="font-size:8px;font-weight:700;color:${sc};border:1px solid ${sc}40;padding:2px 8px;border-radius:2px">${domSev}</span>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:9px;font-family:var(--mono)">
-        <div><div style="color:var(--tm);font-size:8px">ANOMALOUS SEGMENTS</div><div style="color:var(--tp);font-size:14px;font-weight:700">${d.count}</div></div>
-        <div><div style="color:var(--tm);font-size:8px">MAX MSE</div><div style="color:var(--red);font-size:14px;font-weight:700">${d.maxErr.toExponential(2)}</div></div>
-        <div><div style="color:var(--tm);font-size:8px">PEAK DEVIATION</div><div style="color:var(--yellow);font-size:14px;font-weight:700">${d.maxDev.toFixed(1)}×</div></div>
-      </div>
-    </div>`;
-  }).join('');
-
-  // Full scatter chart of all MSE
-  const allChs = Object.keys(db).length ? Object.keys(db) : ['BATT_VOLTAGE_892'];
-  const ch0 = allChs[0];
-  const mses = db[ch0]?.errors || Array.from({length:100},(_,i)=>0.0001*Math.exp(-((i-50)**2)/200)+Math.random()*0.00005);
-  const thresh = parseFloat(document.getElementById('kv-th').textContent) || 0.001;
-  const colors = mses.map(v=>v>thresh?'#f85149':'#3fb950');
-  Plotly.newPlot('anom-detail-content', [
-    {x:mses.map((_,i)=>i),y:mses,type:'scatter',mode:'markers',marker:{color:colors,size:4},name:'MSE',showlegend:false},
-    {x:[0,mses.length],y:[thresh,thresh],type:'scatter',mode:'lines',line:{color:'rgba(248,81,73,.5)',width:1,dash:'dash'},name:'Threshold',showlegend:false}
-  ], {
-    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
-    margin:{l:50,r:10,t:20,b:30},font:{color:'#6e7681',size:9,family:'JetBrains Mono'},
-    xaxis:{title:'Segment',showgrid:false,zeroline:false,color:'#444c56'},
-    yaxis:{title:'MSE',gridcolor:'rgba(255,255,255,.04)',zeroline:false,color:'#444c56'},
-    height:260
-  }, {responsive:true,displayModeBar:false});
-}
-
-// ── TREND ANALYSIS ────────────────────────────────────────────────────────────
-function renderTrendView() {
-  const container = document.getElementById('trend-charts');
-  const channels = Object.keys(db);
-  const plotCfg = {responsive:true,displayModeBar:false};
-  const baseLayout = {
-    paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',
-    margin:{l:45,r:10,t:24,b:28},font:{color:'#6e7681',size:9,family:'JetBrains Mono'},
-    xaxis:{showgrid:false,zeroline:false,color:'#444c56'},
-    yaxis:{gridcolor:'rgba(255,255,255,.04)',zeroline:false,color:'#444c56'},
-    showlegend:true,legend:{font:{size:8,color:'#6e7681'},bgcolor:'rgba(0,0,0,0)'},
-    height:180
-  };
-
-  const useChs = channels.length ? channels.slice(0,4) :
-    ['BATT_VOLTAGE_892','SOLAR_CURRENT_894','BUS_CURRENT_872','BATT_TEMP_884'];
-  const colors = ['#8ab4c8','#3fb950','#7c67b3','#c77a2b'];
-
-  container.innerHTML = useChs.map((ch,i)=>`<div id="tr-ch-${i}" style="background:var(--card);border:1px solid var(--border);border-radius:4px;padding:8px"></div>`).join('');
-
-  useChs.forEach((ch,i) => {
-    const raw = db[ch]?.values || Array.from({length:150},(_,j)=>Math.sin(j/20)*0.5+3.7+Math.random()*0.05);
-    const N = raw.length;
-    const win = Math.max(5, Math.floor(N/20));
-    // Rolling average
-    const rollAvg = raw.map((_,j)=>{
-      const s = raw.slice(Math.max(0,j-win),j+1);
-      return s.reduce((a,b)=>a+b,0)/s.length;
-    });
-    // Simple linear trend
-    const xs = raw.map((_,j)=>j);
-    const mx = xs.reduce((a,b)=>a+b,0)/N;
-    const my = raw.reduce((a,b)=>a+b,0)/N;
-    const slope = xs.reduce((s,x,j)=>s+(x-mx)*(raw[j]-my),0)/xs.reduce((s,x)=>s+(x-mx)**2,0.001);
-    const trend = xs.map(x=>my+slope*(x-mx));
-
-    Plotly.newPlot(`tr-ch-${i}`, [
-      {x:xs,y:raw,type:'scatter',mode:'lines',name:'Raw',line:{color:colors[i]+'55',width:1},showlegend:true},
-      {x:xs,y:rollAvg,type:'scatter',mode:'lines',name:`Rolling avg (${win})`,line:{color:colors[i],width:2}},
-      {x:xs,y:trend,type:'scatter',mode:'lines',name:'Trend',line:{color:'#f85149',width:1,dash:'dash'}}
-    ], {...baseLayout, title:{text:ch,font:{size:10,color:'#c9d1d9'},x:0}}, plotCfg);
-  });
-}
-
-// ── PERFORMANCE METRICS ───────────────────────────────────────────────────────
-function renderPerfView() {
-  const el = document.getElementById('perf-content');
-  el.innerHTML = '<div style="font-size:9px;color:var(--ts);text-align:center;padding:20px">Fetching metadata…</div>';
-  fetch(`${API}/model/metadata`)
-    .then(r => r.json())
-    .then(m => displayPerfMetrics(m))
-    .catch(() => {
-      // Fallback: show plausible values from last result or synthetic
-      displayPerfMetrics({
-        threshold: parseFloat(document.getElementById('kv-th').textContent) || 0.001523,
-        max_len: 100, latent_dim: 64, epochs_trained: 50,
-        best_val_loss: 0.000412, f1_score: 0.847, precision: 0.891,
-        recall: 0.807, sep_ratio: 0.734, train_size: 12400,
-        created_at: new Date().toISOString().substring(0,10)
-      });
-    });
-}
-function displayPerfMetrics(m) {
-  const el = document.getElementById('perf-content');
-  const stat = (label,val,sub='',color='var(--tp)') =>
-    `<div style="background:var(--card);border:1px solid var(--border);border-radius:4px;padding:12px 16px">
-      <div style="font-size:8px;color:var(--ts);font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">${label}</div>
-      <div style="font-size:22px;font-weight:700;color:${color};font-family:'Outfit',sans-serif;line-height:1">${val}</div>
-      ${sub?`<div style="font-size:9px;color:var(--tm);margin-top:4px;font-family:var(--mono)">${sub}</div>`:''}
-    </div>`;
-
-  const f1   = m.f1_score != null ? (m.f1_score*100).toFixed(1)+'%' : '--';
-  const prec = m.precision != null ? (m.precision*100).toFixed(1)+'%' : '--';
-  const rec  = m.recall    != null ? (m.recall*100).toFixed(1)+'%' : '--';
-  const sep  = m.sep_ratio != null ? (m.sep_ratio*100).toFixed(1)+'%' : '--';
-  const thr  = m.threshold != null ? m.threshold.toExponential(4) : '--';
-  const loss = m.best_val_loss != null ? m.best_val_loss.toExponential(3) : '--';
-
-  el.innerHTML = `
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-      ${stat('F1 Score', f1, 'Harmonic mean of precision & recall', parseFloat(f1)>80?'var(--green)':'var(--yellow)')}
-      ${stat('Precision', prec, 'True pos / (true pos + false pos)', 'var(--cyan)')}
-      ${stat('Recall', rec, 'True pos / (true pos + false neg)', 'var(--cyan)')}
-    </div>
-    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px">
-      ${stat('Sep Ratio', sep, 'Nominal vs anomalous MSE separation', 'var(--purple)')}
-      ${stat('Threshold', thr, 'F2-optimised detection cutoff', 'var(--yellow)')}
-      ${stat('Val Loss', loss, 'Best validation loss', 'var(--tp)')}
-    </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:4px;padding:12px">
-      <div style="font-size:9px;font-weight:700;color:var(--ts);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px">Architecture</div>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-family:var(--mono)">
-        <div><div style="font-size:8px;color:var(--tm)">WINDOW LEN</div><div style="font-size:14px;color:var(--tp);font-weight:600">${m.max_len||100}</div></div>
-        <div><div style="font-size:8px;color:var(--tm)">LATENT DIM</div><div style="font-size:14px;color:var(--tp);font-weight:600">${m.latent_dim||64}</div></div>
-        <div><div style="font-size:8px;color:var(--tm)">EPOCHS</div><div style="font-size:14px;color:var(--tp);font-weight:600">${m.epochs_trained||m.epochs||50}</div></div>
-        <div><div style="font-size:8px;color:var(--tm)">TRAIN SAMPLES</div><div style="font-size:14px;color:var(--tp);font-weight:600">${m.train_size?(m.train_size).toLocaleString():'--'}</div></div>
-      </div>
-    </div>`;
-}
-
-// ── CSS animation
-const s=document.createElement('style');
-s.textContent='@keyframes prg{from{transform:translateX(-100%)}to{transform:translateX(100%)}}';
-document.head.appendChild(s);
-</script>
-<script src="/static/netra.js?v=7"></script>
 </body>
 </html>
